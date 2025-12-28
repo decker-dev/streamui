@@ -1,0 +1,53 @@
+---
+title: Introduction
+description: Open source streaming UI components for AI applications. Built for the community.
+---
+
+streamui is an open collection of streaming UI components for React, designed to work seamlessly with AI SDK 6. The goal is simple: **help you build beautiful progressive UIs for AI applications**.
+
+This is my small contribution to the open source community that taught me so much. {'<3'}
+
+## Not a library—an open component distribution
+
+Like shadcn/ui, streamui is not a typical install-from-NPM library. It's an open collection you can copy, modify, and customize directly in your codebase. You own the code. No wrappers, no overrides, no fighting with the library.
+
+Streaming UI is deceptively complex. Progressive rendering, partial data handling, loading states—each one has edge cases and design decisions that take time to get right. streamui gives you battle-tested starting points so you can focus on what makes your product unique.
+
+## Why streamui?
+
+- **Open source & copy-first**: Direct access to source so you can adapt components to your design system
+- **AI SDK 6 compatible**: Built for `Output.object()` and structured streaming
+- **Schema-first**: Zod schemas that work with both AI SDK and component validation
+- **Progressive rendering**: Components update smoothly as data streams in
+- **shadcn compatible**: Install via the shadcn CLI, works with your existing setup
+- **Accessible**: Built with semantic HTML and accessibility in mind
+- **Type-safe**: Full TypeScript support with exported types
+
+## Getting Started
+
+Install your first streaming component:
+
+```bash
+npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
+```
+
+Then use it with AI SDK:
+
+```tsx
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { WeatherCard, weatherCardSchema } from "@/components/stream/weather-card";
+
+export function WeatherDemo() {
+  const { object, submit, isLoading } = useObject({
+    api: "/api/weather",
+    schema: weatherCardSchema,
+  });
+
+  return (
+    <WeatherCard 
+      data={object ?? undefined} 
+      isLoading={isLoading && !object} 
+    />
+  );
+}
+```
