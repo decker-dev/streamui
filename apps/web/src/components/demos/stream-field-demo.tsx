@@ -47,8 +47,18 @@ export function StreamFieldDemo() {
     reset,
   } = useStreamSimulator({ sequence: STREAM_SEQUENCE, delay: 80 });
 
+  const isStreaming = isLoading && data !== undefined;
+  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
+
+  const borderColors = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+  };
+
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
+    <div className="flex w-full max-w-md flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={start} disabled={isLoading}>
@@ -62,37 +72,37 @@ export function StreamFieldDemo() {
           )}
         </div>
         <span className="text-xs text-muted-foreground">
-          Step {step + 1}/{totalSteps}
+          {step === -1 ? "Idle" : `Step ${step + 1}/${totalSteps}`}
         </span>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
+      <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
+        <CardContent className="p-4">
           <Stream.Root data={data} isLoading={isLoading}>
             <div className="space-y-4">
               <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground">
+                <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   path="title"
                 </div>
-                <div className="text-2xl font-bold tracking-tight">
+                <div className="min-h-8 text-2xl font-bold tracking-tight">
                   <Stream.Field path="title" fallback={<Skeleton className="h-8 w-40" />} />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground">
+                <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   path="description"
                 </div>
-                <div className="text-muted-foreground">
+                <div className="min-h-5 text-muted-foreground">
                   <Stream.Field path="description" fallback={<Skeleton className="h-5 w-56" />} />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground">
+                <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   path="value"
                 </div>
-                <div className="text-4xl font-bold tabular-nums">
+                <div className="min-h-10 text-4xl font-bold tabular-nums">
                   <Stream.Field path="value" fallback={<Skeleton className="h-10 w-16" />} />
                 </div>
               </div>
@@ -100,12 +110,6 @@ export function StreamFieldDemo() {
           </Stream.Root>
         </CardContent>
       </Card>
-
-      {isComplete && (
-        <p className="text-center text-sm text-green-600 dark:text-green-400">
-          ✓ Stream complete
-        </p>
-      )}
     </div>
   );
 }

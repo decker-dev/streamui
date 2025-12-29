@@ -10,7 +10,6 @@ import {
   RotateCcw,
 } from "lucide-react";
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -68,46 +67,46 @@ export function StreamWhenDemo() {
 
   React.useEffect(() => cleanup, []);
 
-  const states: DemoState[] = ["idle", "loading", "streaming", "complete", "error"];
+  const borderColors: Record<DemoState, string> = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+    error: "border-destructive/50",
+  };
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm" onClick={() => runSequence(false)} disabled={isLoading}>
-          <Play className="h-3.5 w-3.5" />
-          Success
-        </Button>
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => runSequence(true)}
-          disabled={isLoading}
-        >
-          <Play className="h-3.5 w-3.5" />
-          Error
-        </Button>
-        {currentState !== "idle" && (
-          <Button size="icon" variant="ghost" onClick={reset}>
-            <RotateCcw className="h-4 w-4" />
+    <div className="flex w-full max-w-md flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={() => runSequence(false)} disabled={isLoading}>
+            <Play className="h-3.5 w-3.5" />
+            Success
           </Button>
-        )}
-      </div>
-
-      <div className="flex flex-wrap gap-1.5">
-        {states.map((state) => (
-          <Badge
-            key={state}
-            variant={currentState === state ? "default" : "outline"}
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => runSequence(true)}
+            disabled={isLoading}
           >
-            {state}
-          </Badge>
-        ))}
+            <Play className="h-3.5 w-3.5" />
+            Error
+          </Button>
+          {currentState !== "idle" && (
+            <Button size="icon" variant="ghost" onClick={reset}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground capitalize">
+          {currentState}
+        </span>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
+      <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
+        <CardContent className="p-4">
           <Stream.Root data={data} isLoading={isLoading} error={error}>
-            <div className="flex min-h-[120px] flex-col items-center justify-center gap-3">
+            <div className="flex min-h-[140px] flex-col items-center justify-center gap-3">
               {currentState === "idle" && (
                 <p className="text-sm text-muted-foreground">
                   Click a button to start
@@ -118,7 +117,7 @@ export function StreamWhenDemo() {
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">Loading…</p>
-                  <code className="rounded bg-muted px-2 py-0.5 text-xs">
+                  <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs">
                     {"<Stream.When loading>"}
                   </code>
                 </div>
@@ -136,7 +135,7 @@ export function StreamWhenDemo() {
                   <p className="text-sm text-blue-600 dark:text-blue-400">
                     Streaming data…
                   </p>
-                  <code className="rounded bg-muted px-2 py-0.5 text-xs">
+                  <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs">
                     {"<Stream.When streaming>"}
                   </code>
                 </div>
@@ -148,7 +147,7 @@ export function StreamWhenDemo() {
                   <p className="text-sm text-green-600 dark:text-green-400">
                     Complete!
                   </p>
-                  <code className="rounded bg-muted px-2 py-0.5 text-xs">
+                  <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs">
                     {"<Stream.When complete>"}
                   </code>
                 </div>
@@ -159,7 +158,7 @@ export function StreamWhenDemo() {
                   <div className="flex flex-col items-center gap-2">
                     <AlertCircle className="h-8 w-8 text-destructive" />
                     <p className="text-sm text-destructive">{err.message}</p>
-                    <code className="rounded bg-muted px-2 py-0.5 text-xs">
+                    <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs">
                       {"<Stream.When error>"}
                     </code>
                   </div>

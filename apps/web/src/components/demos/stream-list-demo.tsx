@@ -34,7 +34,7 @@ function ItemCard({ item }: { item: Item }) {
   };
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <Card className="animate-in fade-in slide-in-from-bottom-2 py-0 duration-300">
       <CardContent className="flex items-center gap-3 p-3">
         <span className="font-medium">{item.name}</span>
         <Badge variant={statusVariant[item.status]} className="ml-auto">
@@ -49,7 +49,7 @@ function ListSkeleton() {
   return (
     <div className="space-y-2">
       {[0, 1, 2].map((i) => (
-        <Skeleton key={i} className="h-12 w-full" />
+        <Skeleton key={i} className="h-[46px] w-full rounded-xl" />
       ))}
     </div>
   );
@@ -101,9 +101,18 @@ export function StreamListDemo() {
 
   const isComplete = !isLoading && data !== undefined;
   const isIdle = !isLoading && data === undefined;
+  const isStreaming = isLoading && data !== undefined;
+  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
+
+  const borderColors = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+  };
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
+    <div className="flex w-full max-w-md flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={start} disabled={isLoading}>
@@ -121,9 +130,9 @@ export function StreamListDemo() {
         </span>
       </div>
 
-      <Card>
+      <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
         <CardContent className="p-4">
-          <div className="mb-3 text-xs font-medium text-muted-foreground">
+          <div className="mb-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             path="items"
           </div>
           <Stream.Root data={data} isLoading={isLoading}>
@@ -139,12 +148,6 @@ export function StreamListDemo() {
           </Stream.Root>
         </CardContent>
       </Card>
-
-      {isComplete && (
-        <p className="text-center text-sm text-green-600 dark:text-green-400">
-          ✓ All {ITEMS.length} items loaded
-        </p>
-      )}
     </div>
   );
 }
