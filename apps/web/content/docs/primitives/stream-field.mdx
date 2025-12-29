@@ -7,6 +7,12 @@ description: Access a field from streaming data with automatic fallback.
 
 ## Demo
 
+<DemoPreview>
+  <StreamFieldDemo />
+</DemoPreview>
+
+## Usage
+
 ```tsx
 import { Stream } from "@stream.ui/react";
 
@@ -45,6 +51,8 @@ import { Stream } from "@stream.ui/react";
 ### With Custom Fallback
 
 ```tsx
+import { Skeleton } from "@/components/ui/skeleton";
+
 <Stream.Field 
   path="temperature" 
   fallback={<Skeleton className="h-12 w-20 rounded-md" />}
@@ -62,6 +70,8 @@ import { Stream } from "@stream.ui/react";
 Access deeply nested properties using dot notation:
 
 ```tsx
+import { Droplets } from "lucide-react";
+
 <Stream.Field path="weather.current.humidity">
   {(humidity) => (
     <div className="flex items-center gap-1.5">
@@ -96,11 +106,11 @@ If no fallback is provided, nothing renders until the field exists:
 
 ### Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `path` | `string` | — | Path to the field using dot notation |
-| `fallback` | `ReactNode` | `null` | Content to show while field is undefined |
-| `children` | `(value: T) => ReactNode` | — | Render function that receives the value |
+| Prop | Type | Default |
+| --- | --- | --- |
+| `path` | `string` | — |
+| `fallback` | `ReactNode` | `null` |
+| `children` | `(value: T) => ReactNode` | — |
 
 ### Path Syntax
 

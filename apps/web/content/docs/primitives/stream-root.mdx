@@ -7,6 +7,12 @@ description: The root component that provides streaming context to all children.
 
 ## Demo
 
+<DemoPreview>
+  <StreamRootDemo />
+</DemoPreview>
+
+## Usage
+
 ```tsx
 import { Stream } from "@stream.ui/react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
@@ -69,23 +75,21 @@ import { Stream } from "@stream.ui/react";
 
 ### Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `data` | `DeepPartial<T> \| undefined` | — | The partial data object from useObject |
-| `isLoading` | `boolean` | `false` | Whether the stream is actively loading |
-| `error` | `Error \| undefined` | — | Error if any occurred |
-| `children` | `ReactNode` | — | Children to render |
+| Prop | Type | Default |
+| --- | --- | --- |
+| `data` | `DeepPartial<T> \| undefined` | — |
+| `isLoading` | `boolean` | `false` |
+| `error` | `Error \| undefined` | — |
+| `children` | `ReactNode` | — |
 
 ### Context Value
 
-The context provided to children includes:
-
-| Property | Type | Description |
-| --- | --- | --- |
-| `data` | `DeepPartial<T> \| undefined` | The partial data |
-| `state` | `StreamState` | Current state |
-| `isLoading` | `boolean` | True during loading state |
-| `isStreaming` | `boolean` | True during streaming state |
-| `isComplete` | `boolean` | True when complete |
-| `error` | `Error \| undefined` | Error if any |
+| Property | Type |
+| --- | --- |
+| `data` | `DeepPartial<T> \| undefined` |
+| `state` | `StreamState` |
+| `isLoading` | `boolean` |
+| `isStreaming` | `boolean` |
+| `isComplete` | `boolean` |
+| `error` | `Error \| undefined` |
 

@@ -7,9 +7,36 @@ The `@stream.ui/react` package provides primitives for handling partial/streamin
 
 ## Installation
 
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
 ```bash
 npm install @stream.ui/react
 ```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+pnpm add @stream.ui/react
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+yarn add @stream.ui/react
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+bun add @stream.ui/react
+```
+
+  </Tab>
+</Tabs>
 
 ## Usage
 
@@ -79,4 +106,52 @@ The primitives handle this automatically:
 | `streaming` | Loading, partial data exists |
 | `complete` | Not loading, data exists |
 | `error` | An error occurred |
+
+## TypeScript
+
+The primitives are fully typed. You can pass a generic to `Stream.Root` and `Stream.Field` for type-safe access:
+
+```tsx
+import { Stream } from "@stream.ui/react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+
+interface WeatherData {
+  location: string;
+  temperature: number;
+  forecast: Array<{ day: string; high: number; low: number }>;
+}
+
+function WeatherCard() {
+  const { object, isLoading, error } = useObject<WeatherData>({
+    api: "/api/weather",
+    schema: weatherSchema,
+  });
+
+  return (
+    <Stream.Root<WeatherData> data={object} isLoading={isLoading} error={error}>
+      <Stream.Field<string> path="location">
+        {(location) => <h1>{location}</h1>}
+      </Stream.Field>
+      
+      <Stream.Field<number> path="temperature">
+        {(temp) => <span>{temp}°</span>}
+      </Stream.Field>
+    </Stream.Root>
+  );
+}
+```
+
+Types are also exported for advanced use cases:
+
+```tsx
+import type {
+  DeepPartial,
+  StreamState,
+  StreamContextValue,
+  StreamRootProps,
+  StreamFieldProps,
+  StreamListProps,
+  StreamWhenProps,
+} from "@stream.ui/react";
+```
 

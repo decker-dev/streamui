@@ -7,6 +7,12 @@ description: Conditionally render content based on stream state.
 
 ## Demo
 
+<DemoPreview>
+  <StreamWhenDemo />
+</DemoPreview>
+
+## Usage
+
 ```tsx
 import { Stream } from "@stream.ui/react";
 
@@ -71,6 +77,8 @@ import { Stream } from "@stream.ui/react";
 Show a spinner while waiting for initial data:
 
 ```tsx
+import { Loader2 } from "lucide-react";
+
 <Stream.When loading>
   <div className="flex items-center justify-center py-12">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -98,6 +106,8 @@ Show a pulsing dot while data is actively streaming:
 Show a success message when streaming completes:
 
 ```tsx
+import { CheckCircle } from "lucide-react";
+
 <Stream.When complete>
   <div className="flex items-center gap-2 text-green-600">
     <CheckCircle className="h-4 w-4" />
@@ -132,6 +142,9 @@ Handle errors with access to the error object:
 You can use multiple `Stream.When` components together:
 
 ```tsx
+import { Stream } from "@stream.ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
+
 <Stream.Root data={object} isLoading={isLoading} error={error}>
   <Stream.When loading>
     <Skeleton className="h-32" />
@@ -157,13 +170,13 @@ You can use multiple `Stream.When` components together:
 
 ### Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `loading` | `boolean` | — | Render when in loading state |
-| `streaming` | `boolean` | — | Render when actively streaming |
-| `complete` | `boolean` | — | Render when streaming is complete |
-| `error` | `boolean` | — | Render when an error occurred |
-| `children` | `ReactNode \| ((error: Error) => ReactNode)` | — | Content to render. For error state, can be a function. |
+| Prop | Type | Default |
+| --- | --- | --- |
+| `loading` | `boolean` | — |
+| `streaming` | `boolean` | — |
+| `complete` | `boolean` | — |
+| `error` | `boolean` | — |
+| `children` | `ReactNode \| ((error: Error) => ReactNode)` | — |
 
 ### States
 

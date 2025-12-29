@@ -7,6 +7,12 @@ description: Render arrays that grow as data streams in.
 
 ## Demo
 
+<DemoPreview>
+  <StreamListDemo />
+</DemoPreview>
+
+## Usage
+
 ```tsx
 import { Stream } from "@stream.ui/react";
 
@@ -61,6 +67,8 @@ import { Stream } from "@stream.ui/react";
 ### Grid Layout
 
 ```tsx
+import { Skeleton } from "@/components/ui/skeleton";
+
 <Stream.List
   path="products"
   fallback={
@@ -111,21 +119,21 @@ As the array streams in, items appear incrementally:
 
 ```
 t=0: fallback shown (array undefined)
-t=1: [] (empty array, children called with [])
-t=2: [item1] (children called with [item1])
-t=3: [item1, item2] (children called with [item1, item2])
+t=1: fallback shown (empty array [])
+t=2: children([item1])
+t=3: children([item1, item2])
 ...
 ```
 
-The component automatically filters out `undefined` items that may appear during streaming.
+The component automatically filters out `undefined` and empty items that may appear during streaming. The fallback is shown until at least one valid item exists.
 
 ## API Reference
 
 ### Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `path` | `string` | — | Path to the array field using dot notation |
-| `fallback` | `ReactNode` | `null` | Content to show while array is undefined |
-| `children` | `(items: T[]) => ReactNode` | — | Render function that receives the array |
+| Prop | Type | Default |
+| --- | --- | --- |
+| `path` | `string` | — |
+| `fallback` | `ReactNode` | `null` |
+| `children` | `(items: T[]) => ReactNode` | — |
 
