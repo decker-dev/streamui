@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 import { AnimatedFadeUp, AnimatedHero } from "./animated";
+
+export const metadata: Metadata = {
+  openGraph: {
+    images: {
+      url: "/streamui-banner.png",
+      width: 1200,
+      height: 630,
+      alt: "streamui - Streaming UI components for AI",
+    },
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: {
+      url: "/streamui-banner.png",
+      alt: "streamui - Streaming UI components for AI",
+    },
+  },
+};
 
 export default function HomePage() {
   return (
