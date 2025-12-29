@@ -1,5 +1,6 @@
 "use client";
 
+import { Stream } from "@stream.ui/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from "lucide-react";
 import * as React from "react";
@@ -150,120 +151,134 @@ interface WeatherCardProps
   isLoading?: boolean;
 }
 
+/**
+ * WeatherCard - A streaming-aware weather card component.
+ * 
+ * Built with Stream primitives from @stream.ui/react.
+ * Handles partial data gracefully with automatic skeleton fallbacks.
+ * 
+ * @example
+ * ```tsx
+ * const { object, isLoading } = useObject({
+ *   api: "/api/stream/weather",
+ *   schema: weatherCardSchema,
+ * });
+ * 
+ * <WeatherCard data={object} isLoading={isLoading} />
+ * ```
+ */
 const WeatherCard = React.forwardRef<HTMLDivElement, WeatherCardProps>(
   ({ className, variant, data, isLoading, ...props }, ref) => {
-    const showSkeleton = isLoading || !data;
-
     return (
-      <div
-        ref={ref}
-        className={cn(weatherCardVariants({ variant, className }))}
-        {...props}
-      >
-        <div className="p-6">
-          {/* Location */}
-          <div className="mb-4">
-            {data?.location ? (
-              <h3 className="text-lg font-semibold text-foreground">
-                {data.location}
-              </h3>
-            ) : (
-              <Skeleton className="h-6 w-32" />
-            )}
-          </div>
-
-          {/* Main temperature and condition */}
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-baseline gap-2">
-              {data?.temperature !== undefined ? (
-                <span className="text-5xl font-bold tabular-nums text-foreground">
-                  {Math.round(data.temperature)}°
-                </span>
-              ) : (
-                <Skeleton className="h-12 w-20" />
-              )}
+      <Stream.Root data={data} isLoading={isLoading}>
+        <div
+          ref={ref}
+          className={cn(weatherCardVariants({ variant, className }))}
+          {...props}
+        >
+          <div className="p-6">
+            {/* Location */}
+            <div className="mb-4">
+              <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
+                {(location) => (
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {location as string}
+                  </h3>
+                )}
+              </Stream.Field>
             </div>
 
-            {data?.condition ? (
-              <WeatherIcon condition={data.condition} className="h-12 w-12" />
-            ) : (
-              <Skeleton className="h-12 w-12 rounded-full" />
-            )}
-          </div>
+            {/* Main temperature and condition */}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-baseline gap-2">
+                <Stream.Field path="temperature" fallback={<Skeleton className="h-12 w-20" />}>
+                  {(temp) => (
+                    <span className="text-5xl font-bold tabular-nums text-foreground">
+                      {Math.round(temp as number)}°
+                    </span>
+                  )}
+                </Stream.Field>
+              </div>
 
-          {/* Humidity and Wind */}
-          {(data?.humidity !== undefined ||
-            data?.windSpeed !== undefined ||
-            showSkeleton) && (
+              <Stream.Field path="condition" fallback={<Skeleton className="h-12 w-12 rounded-full" />}>
+                {(condition) => (
+                  <WeatherIcon condition={condition as WeatherCondition} className="h-12 w-12" />
+                )}
+              </Stream.Field>
+            </div>
+
+            {/* Humidity and Wind */}
             <div className="mt-4 flex gap-4">
-              {data?.humidity != null ? (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Droplets className="h-4 w-4" />
-                  <span className="tabular-nums">{data.humidity}%</span>
-                </div>
-              ) : showSkeleton ? (
-                <Skeleton className="h-5 w-14" />
-              ) : null}
+              <Stream.Field path="humidity" fallback={<Skeleton className="h-5 w-14" />}>
+                {(humidity) => (
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Droplets className="h-4 w-4" />
+                    <span className="tabular-nums">{humidity as number}%</span>
+                  </div>
+                )}
+              </Stream.Field>
 
-              {data?.windSpeed != null ? (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Wind className="h-4 w-4" />
-                  <span className="tabular-nums">{data.windSpeed} km/h</span>
-                </div>
-              ) : showSkeleton ? (
-                <Skeleton className="h-5 w-16" />
-              ) : null}
+              <Stream.Field path="windSpeed" fallback={<Skeleton className="h-5 w-16" />}>
+                {(windSpeed) => (
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Wind className="h-4 w-4" />
+                    <span className="tabular-nums">{windSpeed as number} km/h</span>
+                  </div>
+                )}
+              </Stream.Field>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Forecast */}
-        {(data?.forecast || showSkeleton) && (
+          {/* Forecast */}
           <div className="border-t border-border bg-muted/30 px-6 py-4">
-            <div className="grid grid-cols-3 gap-4">
-              {data?.forecast
-                ? data.forecast.filter(Boolean).map((day, index) => (
-                    <div
-                      key={day?.day ?? index}
-                      className="flex flex-col items-center gap-1"
-                    >
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {day?.day ?? "..."}
-                      </span>
-                      {day?.condition ? (
-                        <SmallWeatherIcon condition={day.condition} />
-                      ) : (
-                        <Skeleton className="h-5 w-5 rounded-full" />
-                      )}
-                      <div className="flex gap-1 text-xs tabular-nums">
-                        {day?.high !== undefined ? (
-                          <span className="font-medium">
-                            {Math.round(day.high)}°
-                          </span>
-                        ) : (
-                          <Skeleton className="h-3 w-4" />
-                        )}
-                        {day?.low !== undefined ? (
-                          <span className="text-muted-foreground">
-                            {Math.round(day.low)}°
-                          </span>
-                        ) : (
-                          <Skeleton className="h-3 w-4" />
-                        )}
-                      </div>
-                    </div>
-                  ))
-                : [0, 1, 2].map((i) => (
+            <Stream.List
+              path="forecast"
+              fallback={
+                <div className="grid grid-cols-3 gap-4">
+                  {[0, 1, 2].map((i) => (
                     <div key={i} className="flex flex-col items-center gap-1">
                       <Skeleton className="h-3 w-8" />
                       <Skeleton className="h-5 w-5 rounded-full" />
                       <Skeleton className="h-3 w-10" />
                     </div>
                   ))}
-            </div>
+                </div>
+              }
+            >
+              {(days) => (
+                <div className="grid grid-cols-3 gap-4">
+                  {(days as Array<{ day: string; condition: WeatherCondition; high: number; low: number }>).map((day, index) => (
+                    <div
+                      key={day.day ?? index}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {day.day}
+                      </span>
+                      <SmallWeatherIcon condition={day.condition} />
+                      <div className="flex gap-1 text-xs tabular-nums">
+                        <span className="font-medium">
+                          {Math.round(day.high)}°
+                        </span>
+                        <span className="text-muted-foreground">
+                          {Math.round(day.low)}°
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Stream.List>
           </div>
-        )}
-      </div>
+
+          {/* Streaming indicator */}
+          <Stream.When streaming>
+            <div className="absolute top-3 right-3">
+              <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+            </div>
+          </Stream.When>
+        </div>
+      </Stream.Root>
     );
   },
 );
