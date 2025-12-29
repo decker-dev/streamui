@@ -1,0 +1,39 @@
+{
+  "name": "@stream.ui/react",
+  "version": "0.0.1",
+  "description": "Primitives for streaming UI - React components for AI-generated interfaces",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "react": "19.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["react", "streaming", "ai", "ui", "primitives", "llm", "generative-ui"],
+  "author": "0xDecker",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/decker-dev/streamui"
+  }
+}
+
