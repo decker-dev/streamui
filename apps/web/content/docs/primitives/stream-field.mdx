@@ -1,0 +1,115 @@
+---
+title: Stream.Field
+description: Access a field from streaming data with automatic fallback.
+---
+
+`Stream.Field` accesses a field from the streaming data using dot notation path. Shows the fallback while the field is undefined, then renders children with the value once available.
+
+## Demo
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Root data={object} isLoading={isLoading}>
+  {/* Basic field access */}
+  <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
+    {(location) => (
+      <h3 className="text-lg font-semibold">{location}</h3>
+    )}
+  </Stream.Field>
+
+  {/* Nested path access */}
+  <Stream.Field path="user.profile.name" fallback={<Skeleton className="h-4 w-24" />}>
+    {(name) => <span>{name}</span>}
+  </Stream.Field>
+
+  {/* Array index access */}
+  <Stream.Field path="items.0.title" fallback={<Skeleton className="h-4 w-32" />}>
+    {(title) => <h4>{title}</h4>}
+  </Stream.Field>
+</Stream.Root>
+```
+
+## Anatomy
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Field path="fieldName" fallback={<Fallback />}>
+  {(value) => <YourComponent value={value} />}
+</Stream.Field>
+```
+
+## Examples
+
+### With Custom Fallback
+
+```tsx
+<Stream.Field 
+  path="temperature" 
+  fallback={<Skeleton className="h-12 w-20 rounded-md" />}
+>
+  {(temp) => (
+    <span className="text-5xl font-bold tabular-nums">
+      {Math.round(temp)}°
+    </span>
+  )}
+</Stream.Field>
+```
+
+### Nested Object Path
+
+Access deeply nested properties using dot notation:
+
+```tsx
+<Stream.Field path="weather.current.humidity">
+  {(humidity) => (
+    <div className="flex items-center gap-1.5">
+      <Droplets className="h-4 w-4" />
+      <span>{humidity}%</span>
+    </div>
+  )}
+</Stream.Field>
+```
+
+### Array Index Path
+
+Access array items by index:
+
+```tsx
+<Stream.Field path="forecast.0.condition">
+  {(condition) => <WeatherIcon condition={condition} />}
+</Stream.Field>
+```
+
+### Without Fallback
+
+If no fallback is provided, nothing renders until the field exists:
+
+```tsx
+<Stream.Field path="optionalField">
+  {(value) => <OptionalContent value={value} />}
+</Stream.Field>
+```
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `path` | `string` | — | Path to the field using dot notation |
+| `fallback` | `ReactNode` | `null` | Content to show while field is undefined |
+| `children` | `(value: T) => ReactNode` | — | Render function that receives the value |
+
+### Path Syntax
+
+The `path` prop supports dot notation for accessing nested values:
+
+| Path | Accesses |
+| --- | --- |
+| `"name"` | `data.name` |
+| `"user.email"` | `data.user.email` |
+| `"items.0"` | `data.items[0]` |
+| `"items.0.title"` | `data.items[0].title` |
+

@@ -1,0 +1,82 @@
+---
+title: Overview
+description: Primitives for building streaming UI with React.
+---
+
+The `@stream.ui/react` package provides primitives for handling partial/streaming data in React applications.
+
+## Installation
+
+```bash
+npm install @stream.ui/react
+```
+
+## Usage
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+function MyComponent() {
+  const { object, isLoading, error } = useObject({ ... });
+
+  return (
+    <Stream.Root data={object} isLoading={isLoading} error={error}>
+      <Stream.Field path="title" fallback={<Skeleton />}>
+        {(title) => <h1>{title}</h1>}
+      </Stream.Field>
+      
+      <Stream.List path="items" fallback={<ItemsSkeleton />}>
+        {(items) => items.map(item => <Item key={item.id} {...item} />)}
+      </Stream.List>
+      
+      <Stream.When loading>
+        <Spinner />
+      </Stream.When>
+      
+      <Stream.When error>
+        {(err) => <ErrorMessage error={err} />}
+      </Stream.When>
+    </Stream.Root>
+  );
+}
+```
+
+## Primitives
+
+| Primitive | Description |
+| --- | --- |
+| [`Stream.Root`](/docs/primitives/stream-root) | Provides context with streaming data and state |
+| [`Stream.Field`](/docs/primitives/stream-field) | Accesses a field by path with automatic fallback |
+| [`Stream.List`](/docs/primitives/stream-list) | Renders arrays that grow as data streams in |
+| [`Stream.When`](/docs/primitives/stream-when) | Conditionally renders based on stream state |
+
+## How It Works
+
+When you use `useObject` from AI SDK, data arrives incrementally:
+
+```
+t=0: undefined
+t=1: { title: "Hello" }
+t=2: { title: "Hello", items: [] }
+t=3: { title: "Hello", items: [{ id: 1 }] }
+t=4: { title: "Hello", items: [{ id: 1 }, { id: 2 }] }
+...
+```
+
+The primitives handle this automatically:
+
+1. **Stream.Root** tracks the state (loading → streaming → complete)
+2. **Stream.Field** shows fallback until the field exists
+3. **Stream.List** renders items as they arrive
+4. **Stream.When** shows different UI based on state
+
+## States
+
+| State | Condition |
+| --- | --- |
+| `idle` | No data, not loading |
+| `loading` | Loading, no data yet |
+| `streaming` | Loading, partial data exists |
+| `complete` | Not loading, data exists |
+| `error` | An error occurred |
+

@@ -1,0 +1,91 @@
+---
+title: Stream.Root
+description: The root component that provides streaming context to all children.
+---
+
+`Stream.Root` is the foundation of StreamUI. It provides context with the streaming data and state to all child primitives.
+
+## Demo
+
+```tsx
+import { Stream } from "@stream.ui/react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+
+function WeatherCard() {
+  const { object, isLoading, error } = useObject({
+    api: "/api/weather",
+    schema: weatherSchema,
+  });
+
+  return (
+    <Stream.Root data={object} isLoading={isLoading} error={error}>
+      <div className="rounded-2xl border bg-card p-6">
+        <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
+          {(location) => (
+            <h3 className="text-lg font-semibold">{location}</h3>
+          )}
+        </Stream.Field>
+        
+        <Stream.Field path="temperature" fallback={<Skeleton className="h-12 w-20" />}>
+          {(temp) => (
+            <span className="text-5xl font-bold">{temp}°</span>
+          )}
+        </Stream.Field>
+        
+        <Stream.When streaming>
+          <div className="absolute top-3 right-3">
+            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          </div>
+        </Stream.When>
+      </div>
+    </Stream.Root>
+  );
+}
+```
+
+## Anatomy
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Root data={object} isLoading={isLoading} error={error}>
+  {/* Stream.Field, Stream.List, Stream.When go here */}
+</Stream.Root>
+```
+
+## States
+
+`Stream.Root` derives the current state from its props:
+
+| State | Condition |
+| --- | --- |
+| `idle` | `!isLoading && !data && !error` |
+| `loading` | `isLoading && !data` |
+| `streaming` | `isLoading && data` |
+| `complete` | `!isLoading && data` |
+| `error` | `error` exists |
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `DeepPartial<T> \| undefined` | — | The partial data object from useObject |
+| `isLoading` | `boolean` | `false` | Whether the stream is actively loading |
+| `error` | `Error \| undefined` | — | Error if any occurred |
+| `children` | `ReactNode` | — | Children to render |
+
+### Context Value
+
+The context provided to children includes:
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `data` | `DeepPartial<T> \| undefined` | The partial data |
+| `state` | `StreamState` | Current state |
+| `isLoading` | `boolean` | True during loading state |
+| `isStreaming` | `boolean` | True during streaming state |
+| `isComplete` | `boolean` | True when complete |
+| `error` | `Error \| undefined` | Error if any |
+

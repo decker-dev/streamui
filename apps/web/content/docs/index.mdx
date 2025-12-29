@@ -1,37 +1,95 @@
 ---
 title: Introduction
-description: Open source streaming UI components for AI applications. Built for the community.
+description: Primitives and components for streaming UI. Build beautiful progressive interfaces for AI applications.
 ---
 
-streamui is an open collection of streaming UI components for React, designed to work seamlessly with AI SDK 6. The goal is simple: **help you build beautiful progressive UIs for AI applications**.
+StreamUI is a collection of **primitives** and **components** for building streaming user interfaces with React and AI SDK.
 
-This is my small contribution to the open source community that taught me so much. {'<3'}
+## The Problem
 
-## Not a library—an open component distribution
+When you use `useObject` from AI SDK, you get partial data that arrives piece by piece:
 
-Like shadcn/ui, streamui is not a typical install-from-NPM library. It's an open collection you can copy, modify, and customize directly in your codebase. You own the code. No wrappers, no overrides, no fighting with the library.
+```tsx
+// Moment 1: object = undefined
+// Moment 2: object = { location: "Tokyo" }
+// Moment 3: object = { location: "Tokyo", temperature: 22 }
+// Moment 4: object = { location: "Tokyo", temperature: 22, forecast: [...] }
+```
 
-Streaming UI is deceptively complex. Progressive rendering, partial data handling, loading states—each one has edge cases and design decisions that take time to get right. streamui gives you battle-tested starting points so you can focus on what makes your product unique.
+Without StreamUI, you write this pattern over and over:
 
-## Why streamui?
+```tsx
+{data?.location ? (
+  <h1>{data.location}</h1>
+) : (
+  <Skeleton className="h-6 w-32" />
+)}
+```
 
-- **Open source & copy-first**: Direct access to source so you can adapt components to your design system
-- **AI SDK 6 compatible**: Built for `Output.object()` and structured streaming
-- **Schema-first**: Zod schemas that work with both AI SDK and component validation
-- **Progressive rendering**: Components update smoothly as data streams in
-- **shadcn compatible**: Install via the shadcn CLI, works with your existing setup
-- **Accessible**: Built with semantic HTML and accessibility in mind
-- **Type-safe**: Full TypeScript support with exported types
+## The Solution
 
-## Getting Started
+StreamUI provides **primitives** that abstract this pattern:
 
-Install your first streaming component:
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Root data={object} isLoading={isLoading}>
+  <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
+    {(location) => <h1>{location}</h1>}
+  </Stream.Field>
+</Stream.Root>
+```
+
+And **components** that use these primitives with beautiful styling:
+
+```tsx
+import { WeatherCard } from "@/components/stream/weather-card";
+
+<WeatherCard data={object} isLoading={isLoading} />
+```
+
+## Two Parts
+
+### Primitives (`@stream.ui/react`)
+
+Install via npm. The foundation for building streaming UIs.
+
+```bash
+npm install @stream.ui/react
+```
+
+| Primitive | Description |
+| --- | --- |
+| `Stream.Root` | Provides context with streaming data and state |
+| `Stream.Field` | Accesses a field by path, shows fallback while undefined |
+| `Stream.List` | Renders arrays that grow as data streams in |
+| `Stream.When` | Conditionally renders based on stream state |
+
+### Components (copy/paste)
+
+Like shadcn/ui, components are **not** installed via npm. Copy them into your codebase and customize.
 
 ```bash
 npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
 ```
 
-Then use it with AI SDK:
+Components use the primitives internally and work with shadcn/ui out of the box.
+
+## Quick Start
+
+### 1. Install primitives
+
+```bash
+npm install @stream.ui/react
+```
+
+### 2. Add a component
+
+```bash
+npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
+```
+
+### 3. Use with AI SDK
 
 ```tsx
 import { experimental_useObject as useObject } from "@ai-sdk/react";
@@ -51,3 +109,10 @@ export function WeatherDemo() {
   );
 }
 ```
+
+## Philosophy
+
+- **Primitives are installed** — `npm install @stream.ui/react`
+- **Components are copied** — own the code, customize freely
+- **Works with shadcn** — components use shadcn primitives
+- **AI SDK native** — built for `useObject` and structured streaming

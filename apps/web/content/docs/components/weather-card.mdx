@@ -1,17 +1,15 @@
 ---
 title: Weather Card
-description: A streaming weather card component that renders progressively as AI generates the data.
+description: A streaming weather card component built with Stream primitives.
 ---
 
 import { WeatherCard, WeatherCardDemo } from "@/registry/stream";
 
-<Callout type="info">
-  This component demonstrates streaming UI with AI SDK 6. It uses `streamText` with `Output.object()` to progressively render weather data as it streams from the AI model.
-</Callout>
+A streaming weather card that renders progressively as AI generates the data. Built with Stream primitives from `@stream.ui/react`.
 
 ## Interactive Demo
 
-Try it live! Enter a city name or click one of the quick-select buttons to see the weather card stream in real-time.
+Try it live! Enter a city name or click one of the quick-select buttons.
 
 <ComponentPreview>
   <WeatherCardDemo />
@@ -42,17 +40,36 @@ Try it live! Enter a city name or click one of the quick-select buttons to see t
 
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
+
+### 1. Install primitives
+
+```bash
+npm install @stream.ui/react
+```
+
+### 2. Add the component
+
 ```bash
 npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
 ```
+
   </Tab>
   <Tab value="Manual">
+
+### 1. Install primitives
+
+```bash
+npm install @stream.ui/react
+```
+
+### 2. Copy the component
 
 ```tsx title="components/stream/weather-card.tsx"
 "use client";
 
+import { Stream } from "@stream.ui/react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Cloud, CloudRain, CloudSnow, Sun, Wind, Droplets } from "lucide-react";
+import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from "lucide-react";
 import * as React from "react";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
@@ -61,21 +78,45 @@ export const weatherCardSchema = z.object({
   location: z.string().describe("City name"),
   temperature: z.number().describe("Temperature in Celsius"),
   condition: z.enum(["sunny", "cloudy", "rainy", "snowy", "windy"]),
-  humidity: z.number().optional().describe("Humidity percentage"),
-  windSpeed: z.number().optional().describe("Wind speed in km/h"),
+  humidity: z.number().nullable().describe("Humidity percentage"),
+  windSpeed: z.number().nullable().describe("Wind speed in km/h"),
   forecast: z.array(z.object({
     day: z.string(),
     high: z.number(),
     low: z.number(),
     condition: z.enum(["sunny", "cloudy", "rainy", "snowy", "windy"]),
-  })).optional(),
+  })).nullable(),
 });
 
-// ... component code
+// ... full component code
 ```
 
   </Tab>
 </Tabs>
+
+## Built with Primitives
+
+This component uses Stream primitives internally:
+
+```tsx
+<Stream.Root data={data} isLoading={isLoading}>
+  <Stream.Field path="location" fallback={<Skeleton />}>
+    {(location) => <h3>{location}</h3>}
+  </Stream.Field>
+  
+  <Stream.Field path="temperature" fallback={<Skeleton />}>
+    {(temp) => <span>{temp}°</span>}
+  </Stream.Field>
+  
+  <Stream.List path="forecast" fallback={<ForecastSkeleton />}>
+    {(days) => days.map(day => <ForecastDay {...day} />)}
+  </Stream.List>
+  
+  <Stream.When streaming>
+    <PulsingIndicator />
+  </Stream.When>
+</Stream.Root>
+```
 
 ## Examples
 
@@ -114,7 +155,7 @@ Use `isLoading` to show skeleton placeholders.
 
 ### Progressive Rendering
 
-As data streams in, the component updates progressively.
+As data streams in, fields appear incrementally.
 
 <ComponentPreview component="weather-card" example="partial">
   <div className="w-full max-w-sm mx-auto">
@@ -156,8 +197,6 @@ Use `variant="elevated"` for more visual prominence.
 
 ### API Route
 
-Create an API route that uses `streamText` with `Output.object()`:
-
 ```tsx title="app/api/stream/weather/route.ts"
 import { streamText, Output, gateway } from "ai";
 import { weatherCardSchema } from "@/components/stream/weather-card";
@@ -178,8 +217,6 @@ export async function POST(request: Request) {
 
 ### Client Component
 
-Use `experimental_useObject` to consume the structured output stream:
-
 ```tsx title="components/weather-demo.tsx"
 "use client";
 
@@ -196,7 +233,7 @@ export function WeatherDemo() {
     <div>
       <WeatherCard data={object ?? undefined} isLoading={isLoading && !object} />
       
-      {error && <p>Error: {error.message}</p>}
+      {error && <p className="text-red-500">Error: {error.message}</p>}
       
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -215,8 +252,6 @@ export function WeatherDemo() {
 
 ### WeatherCard
 
-The main component for displaying weather data.
-
 | Prop | Type | Default |
 | --- | --- | --- |
 | `data` | `Partial<WeatherCardData>` | — |
@@ -224,8 +259,6 @@ The main component for displaying weather data.
 | `variant` | `"default" \| "elevated"` | `"default"` |
 
 ### WeatherCardData (Schema)
-
-The Zod schema for weather data. Use this with `Output.object()`.
 
 | Property | Type | Required |
 | --- | --- | --- |
@@ -236,11 +269,3 @@ The Zod schema for weather data. Use this with `Output.object()`.
 | `windSpeed` | `number` | No |
 | `forecast` | `Array<ForecastDay>` | No |
 
-### ForecastDay
-
-| Property | Type |
-| --- | --- |
-| `day` | `string` |
-| `high` | `number` |
-| `low` | `number` |
-| `condition` | `WeatherCondition` |

@@ -1,0 +1,131 @@
+---
+title: Stream.List
+description: Render arrays that grow as data streams in.
+---
+
+`Stream.List` accesses an array field from the streaming data. Shows the fallback while the array is undefined, then renders children with the items as they arrive.
+
+## Demo
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Root data={object} isLoading={isLoading}>
+  <Stream.List
+    path="forecast"
+    fallback={
+      <div className="grid grid-cols-3 gap-4">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-20" />
+        ))}
+      </div>
+    }
+  >
+    {(days) => (
+      <div className="grid grid-cols-3 gap-4">
+        {days.map((day) => (
+          <ForecastDay key={day.id} {...day} />
+        ))}
+      </div>
+    )}
+  </Stream.List>
+</Stream.Root>
+```
+
+## Anatomy
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.List path="arrayField" fallback={<Fallback />}>
+  {(items) => items.map(item => <Item key={item.id} {...item} />)}
+</Stream.List>
+```
+
+## Examples
+
+### Basic List
+
+```tsx
+<Stream.List path="results" fallback={<ResultsSkeleton />}>
+  {(results) => (
+    <ul className="space-y-2">
+      {results.map((result) => (
+        <li key={result.id}>{result.title}</li>
+      ))}
+    </ul>
+  )}
+</Stream.List>
+```
+
+### Grid Layout
+
+```tsx
+<Stream.List
+  path="products"
+  fallback={
+    <div className="grid grid-cols-3 gap-4">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <Skeleton key={i} className="h-48 rounded-xl" />
+      ))}
+    </div>
+  }
+>
+  {(products) => (
+    <div className="grid grid-cols-3 gap-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} {...product} />
+      ))}
+    </div>
+  )}
+</Stream.List>
+```
+
+### Nested List Path
+
+```tsx
+<Stream.List path="user.posts" fallback={<PostsSkeleton />}>
+  {(posts) => posts.map(post => <PostCard key={post.id} post={post} />)}
+</Stream.List>
+```
+
+### With Empty State
+
+Handle empty arrays by checking length:
+
+```tsx
+<Stream.List path="notifications" fallback={<NotificationsSkeleton />}>
+  {(notifications) => 
+    notifications.length === 0 ? (
+      <EmptyState message="No notifications" />
+    ) : (
+      notifications.map(n => <Notification key={n.id} {...n} />)
+    )
+  }
+</Stream.List>
+```
+
+## How It Works
+
+As the array streams in, items appear incrementally:
+
+```
+t=0: fallback shown (array undefined)
+t=1: [] (empty array, children called with [])
+t=2: [item1] (children called with [item1])
+t=3: [item1, item2] (children called with [item1, item2])
+...
+```
+
+The component automatically filters out `undefined` items that may appear during streaming.
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `path` | `string` | — | Path to the array field using dot notation |
+| `fallback` | `ReactNode` | `null` | Content to show while array is undefined |
+| `children` | `(items: T[]) => ReactNode` | — | Render function that receives the array |
+

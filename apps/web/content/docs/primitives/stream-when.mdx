@@ -1,0 +1,176 @@
+---
+title: Stream.When
+description: Conditionally render content based on stream state.
+---
+
+`Stream.When` conditionally renders content based on the current state of the stream. Use it to show different UI during loading, streaming, completion, or error states.
+
+## Demo
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+<Stream.Root data={object} isLoading={isLoading} error={error}>
+  <div className="relative rounded-2xl border bg-card p-6">
+    {/* Content */}
+    <Stream.Field path="title">
+      {(title) => <h1>{title}</h1>}
+    </Stream.Field>
+
+    {/* Loading indicator */}
+    <Stream.When loading>
+      <div className="flex items-center justify-center py-8">
+        <Spinner />
+      </div>
+    </Stream.When>
+
+    {/* Streaming indicator */}
+    <Stream.When streaming>
+      <div className="absolute top-3 right-3">
+        <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+      </div>
+    </Stream.When>
+
+    {/* Success indicator */}
+    <Stream.When complete>
+      <CheckCircle className="text-green-500" />
+    </Stream.When>
+
+    {/* Error message */}
+    <Stream.When error>
+      {(err) => (
+        <div className="rounded-md bg-red-50 p-4 text-red-800">
+          Error: {err.message}
+        </div>
+      )}
+    </Stream.When>
+  </div>
+</Stream.Root>
+```
+
+## Anatomy
+
+```tsx
+import { Stream } from "@stream.ui/react";
+
+{/* Simple usage */}
+<Stream.When loading>
+  <LoadingContent />
+</Stream.When>
+
+{/* With render function (for error state) */}
+<Stream.When error>
+  {(error) => <ErrorContent error={error} />}
+</Stream.When>
+```
+
+## Examples
+
+### Loading State
+
+Show a spinner while waiting for initial data:
+
+```tsx
+<Stream.When loading>
+  <div className="flex items-center justify-center py-12">
+    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+  </div>
+</Stream.When>
+```
+
+### Streaming Indicator
+
+Show a pulsing dot while data is actively streaming:
+
+```tsx
+<Stream.When streaming>
+  <div className="absolute top-3 right-3">
+    <span className="relative flex h-3 w-3">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+      <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+    </span>
+  </div>
+</Stream.When>
+```
+
+### Completion State
+
+Show a success message when streaming completes:
+
+```tsx
+<Stream.When complete>
+  <div className="flex items-center gap-2 text-green-600">
+    <CheckCircle className="h-4 w-4" />
+    <span>Generation complete</span>
+  </div>
+</Stream.When>
+```
+
+### Error Handling
+
+Handle errors with access to the error object:
+
+```tsx
+<Stream.When error>
+  {(error) => (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+      <h4 className="font-medium text-red-800">Something went wrong</h4>
+      <p className="text-sm text-red-600">{error.message}</p>
+      <button 
+        onClick={retry}
+        className="mt-2 text-sm text-red-700 underline"
+      >
+        Try again
+      </button>
+    </div>
+  )}
+</Stream.When>
+```
+
+### Combining States
+
+You can use multiple `Stream.When` components together:
+
+```tsx
+<Stream.Root data={object} isLoading={isLoading} error={error}>
+  <Stream.When loading>
+    <Skeleton className="h-32" />
+  </Stream.When>
+  
+  <Stream.When streaming>
+    <div className="opacity-70">
+      <Content data={object} />
+    </div>
+  </Stream.When>
+  
+  <Stream.When complete>
+    <Content data={object} />
+  </Stream.When>
+  
+  <Stream.When error>
+    {(err) => <ErrorState error={err} />}
+  </Stream.When>
+</Stream.Root>
+```
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `loading` | `boolean` | — | Render when in loading state |
+| `streaming` | `boolean` | — | Render when actively streaming |
+| `complete` | `boolean` | — | Render when streaming is complete |
+| `error` | `boolean` | — | Render when an error occurred |
+| `children` | `ReactNode \| ((error: Error) => ReactNode)` | — | Content to render. For error state, can be a function. |
+
+### States
+
+| State | When Active |
+| --- | --- |
+| `loading` | `isLoading && !data` — Waiting for initial data |
+| `streaming` | `isLoading && data` — Data arriving incrementally |
+| `complete` | `!isLoading && data` — All data received |
+| `error` | `error` exists — An error occurred |
+
