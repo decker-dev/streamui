@@ -30,7 +30,10 @@ export function WeatherCardDemo() {
   return (
     <div className="flex flex-col gap-6">
       <div className="w-full max-w-sm mx-auto">
-        <WeatherCard data={object ?? undefined} isLoading={isLoading && !object} />
+        <WeatherCard
+          data={object ?? undefined}
+          isLoading={isLoading && !object}
+        />
       </div>
 
       {error && (
@@ -48,24 +51,30 @@ export function WeatherCardDemo() {
           disabled={isLoading}
           className="flex-1"
         />
-        <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()}>
+        <Button
+          type="submit"
+          size="icon"
+          disabled={isLoading || !inputValue.trim()}
+        >
           <Send className="h-4 w-4" />
           <span className="sr-only">Get weather</span>
         </Button>
       </form>
 
       <div className="flex flex-wrap justify-center gap-2">
-        {["Tokyo", "New York", "London", "Sydney", "Buenos Aires"].map((city) => (
-          <Button
-            key={city}
-            variant="outline"
-            size="sm"
-            onClick={() => handleQuickCity(city)}
-            disabled={isLoading}
-          >
-            {city}
-          </Button>
-        ))}
+        {["Tokyo", "New York", "London", "Sydney", "Buenos Aires"].map(
+          (city) => (
+            <Button
+              key={city}
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickCity(city)}
+              disabled={isLoading}
+            >
+              {city}
+            </Button>
+          ),
+        )}
       </div>
     </div>
   );

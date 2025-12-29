@@ -6,6 +6,6 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: <Logo size={24} />,
     },
-    githubUrl: "https://github.com/commet-labs/streamui",
+    githubUrl: "https://github.com/decker-dev/streamui",
   };
 }

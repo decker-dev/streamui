@@ -6,9 +6,7 @@ export default function StreamDemoPage() {
       <div className="container mx-auto py-12 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              StreamUI Demo
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">StreamUI Demo</h1>
             <p className="text-muted-foreground">
               Weather card that streams progressively from AI
             </p>
@@ -24,4 +22,3 @@ export default function StreamDemoPage() {
     </div>
   );
 }
-

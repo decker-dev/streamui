@@ -1,21 +1,14 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import {
-  Cloud,
-  CloudRain,
-  CloudSnow,
-  Sun,
-  Wind,
-  Droplets,
-} from "lucide-react";
+import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
-  weatherCardSchema,
-  weatherConditions,
   type WeatherCardData,
   type WeatherCondition,
+  weatherCardSchema,
+  weatherConditions,
 } from "./weather-card-schema";
 
 // Re-export schema and types for convenience
@@ -37,7 +30,10 @@ const weatherCardVariants = cva(
   },
 );
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn("animate-pulse rounded-md bg-muted", className)}
@@ -57,15 +53,40 @@ function WeatherIcon({
 
   switch (condition) {
     case "sunny":
-      return <Sun {...iconProps} className={cn(iconProps.className, "text-amber-500")} />;
+      return (
+        <Sun
+          {...iconProps}
+          className={cn(iconProps.className, "text-amber-500")}
+        />
+      );
     case "cloudy":
-      return <Cloud {...iconProps} className={cn(iconProps.className, "text-slate-400")} />;
+      return (
+        <Cloud
+          {...iconProps}
+          className={cn(iconProps.className, "text-slate-400")}
+        />
+      );
     case "rainy":
-      return <CloudRain {...iconProps} className={cn(iconProps.className, "text-blue-500")} />;
+      return (
+        <CloudRain
+          {...iconProps}
+          className={cn(iconProps.className, "text-blue-500")}
+        />
+      );
     case "snowy":
-      return <CloudSnow {...iconProps} className={cn(iconProps.className, "text-sky-300")} />;
+      return (
+        <CloudSnow
+          {...iconProps}
+          className={cn(iconProps.className, "text-sky-300")}
+        />
+      );
     case "windy":
-      return <Wind {...iconProps} className={cn(iconProps.className, "text-teal-500")} />;
+      return (
+        <Wind
+          {...iconProps}
+          className={cn(iconProps.className, "text-teal-500")}
+        />
+      );
   }
 }
 
@@ -80,15 +101,40 @@ function SmallWeatherIcon({
 
   switch (condition) {
     case "sunny":
-      return <Sun {...iconProps} className={cn(iconProps.className, "text-amber-500")} />;
+      return (
+        <Sun
+          {...iconProps}
+          className={cn(iconProps.className, "text-amber-500")}
+        />
+      );
     case "cloudy":
-      return <Cloud {...iconProps} className={cn(iconProps.className, "text-slate-400")} />;
+      return (
+        <Cloud
+          {...iconProps}
+          className={cn(iconProps.className, "text-slate-400")}
+        />
+      );
     case "rainy":
-      return <CloudRain {...iconProps} className={cn(iconProps.className, "text-blue-500")} />;
+      return (
+        <CloudRain
+          {...iconProps}
+          className={cn(iconProps.className, "text-blue-500")}
+        />
+      );
     case "snowy":
-      return <CloudSnow {...iconProps} className={cn(iconProps.className, "text-sky-300")} />;
+      return (
+        <CloudSnow
+          {...iconProps}
+          className={cn(iconProps.className, "text-sky-300")}
+        />
+      );
     case "windy":
-      return <Wind {...iconProps} className={cn(iconProps.className, "text-teal-500")} />;
+      return (
+        <Wind
+          {...iconProps}
+          className={cn(iconProps.className, "text-teal-500")}
+        />
+      );
   }
 }
 
@@ -146,7 +192,9 @@ const WeatherCard = React.forwardRef<HTMLDivElement, WeatherCardProps>(
           </div>
 
           {/* Humidity and Wind */}
-          {(data?.humidity !== undefined || data?.windSpeed !== undefined || showSkeleton) && (
+          {(data?.humidity !== undefined ||
+            data?.windSpeed !== undefined ||
+            showSkeleton) && (
             <div className="mt-4 flex gap-4">
               {data?.humidity != null ? (
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -173,44 +221,45 @@ const WeatherCard = React.forwardRef<HTMLDivElement, WeatherCardProps>(
         {(data?.forecast || showSkeleton) && (
           <div className="border-t border-border bg-muted/30 px-6 py-4">
             <div className="grid grid-cols-3 gap-4">
-              {data?.forecast ? (
-                data.forecast.filter(Boolean).map((day, index) => (
-                  <div key={day?.day ?? index} className="flex flex-col items-center gap-1">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {day?.day ?? "..."}
-                    </span>
-                    {day?.condition ? (
-                      <SmallWeatherIcon condition={day.condition} />
-                    ) : (
-                      <Skeleton className="h-5 w-5 rounded-full" />
-                    )}
-                    <div className="flex gap-1 text-xs tabular-nums">
-                      {day?.high !== undefined ? (
-                        <span className="font-medium">{Math.round(day.high)}°</span>
+              {data?.forecast
+                ? data.forecast.filter(Boolean).map((day, index) => (
+                    <div
+                      key={day?.day ?? index}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {day?.day ?? "..."}
+                      </span>
+                      {day?.condition ? (
+                        <SmallWeatherIcon condition={day.condition} />
                       ) : (
-                        <Skeleton className="h-3 w-4" />
+                        <Skeleton className="h-5 w-5 rounded-full" />
                       )}
-                      {day?.low !== undefined ? (
-                        <span className="text-muted-foreground">
-                          {Math.round(day.low)}°
-                        </span>
-                      ) : (
-                        <Skeleton className="h-3 w-4" />
-                      )}
+                      <div className="flex gap-1 text-xs tabular-nums">
+                        {day?.high !== undefined ? (
+                          <span className="font-medium">
+                            {Math.round(day.high)}°
+                          </span>
+                        ) : (
+                          <Skeleton className="h-3 w-4" />
+                        )}
+                        {day?.low !== undefined ? (
+                          <span className="text-muted-foreground">
+                            {Math.round(day.low)}°
+                          </span>
+                        ) : (
+                          <Skeleton className="h-3 w-4" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <>
-                  {[0, 1, 2].map((i) => (
+                  ))
+                : [0, 1, 2].map((i) => (
                     <div key={i} className="flex flex-col items-center gap-1">
                       <Skeleton className="h-3 w-8" />
                       <Skeleton className="h-5 w-5 rounded-full" />
                       <Skeleton className="h-3 w-10" />
                     </div>
                   ))}
-                </>
-              )}
             </div>
           </div>
         )}
@@ -222,4 +271,3 @@ WeatherCard.displayName = "WeatherCard";
 
 export { WeatherCard, WeatherIcon, weatherCardVariants };
 export type { WeatherCardProps };
-

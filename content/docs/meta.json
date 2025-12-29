@@ -1,8 +1,4 @@
 {
   "title": "Documentation",
-  "pages": [
-    "index",
-    "---Stream---",
-    "stream/weather-card"
-  ]
+  "pages": ["index", "---Stream---", "stream/weather-card"]
 }

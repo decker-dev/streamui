@@ -1,5 +1,4 @@
-import { streamText, Output } from "ai";
-import { gateway } from "ai";
+import { gateway, Output, streamText } from "ai";
 import { weatherCardSchema } from "@/registry/stream/weather-card-schema";
 
 export async function POST(request: Request) {

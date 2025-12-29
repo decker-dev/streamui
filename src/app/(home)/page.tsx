@@ -50,7 +50,7 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
-              href="https://github.com/commet-labs/streamui"
+              href="https://github.com/decker-dev/streamui"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-full border bg-background/80 backdrop-blur-sm hover:bg-accent transition-colors"
@@ -256,7 +256,7 @@ export default function HomePage() {
           </a>
           . Open source on{" "}
           <a
-            href="https://github.com/commet-labs/streamui"
+            href="https://github.com/decker-dev/streamui"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-foreground hover:underline underline-offset-4"
