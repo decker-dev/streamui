@@ -247,22 +247,53 @@ const WeatherCard = React.forwardRef<HTMLDivElement, WeatherCardProps>(
             >
               {(days) => (
                 <div className="grid grid-cols-3 gap-4">
-                  {(days as Array<{ day: string; condition: WeatherCondition; high: number; low: number }>).map((day, index) => (
+                  {(days as unknown[]).map((_, index) => (
                     <div
-                      key={day.day ?? index}
+                      key={index}
                       className="flex flex-col items-center gap-1"
                     >
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {day.day}
-                      </span>
-                      <SmallWeatherIcon condition={day.condition} />
+                      <Stream.Field 
+                        path={`forecast.${index}.day`} 
+                        fallback={<Skeleton className="h-3 w-8" />}
+                      >
+                        {(day) => (
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {day as string}
+                          </span>
+                        )}
+                      </Stream.Field>
+                      
+                      <Stream.Field 
+                        path={`forecast.${index}.condition`} 
+                        fallback={<Skeleton className="h-5 w-5 rounded-full" />}
+                      >
+                        {(condition) => (
+                          <SmallWeatherIcon condition={condition as WeatherCondition} />
+                        )}
+                      </Stream.Field>
+                      
                       <div className="flex gap-1 text-xs tabular-nums">
-                        <span className="font-medium">
-                          {Math.round(day.high)}°
-                        </span>
-                        <span className="text-muted-foreground">
-                          {Math.round(day.low)}°
-                        </span>
+                        <Stream.Field 
+                          path={`forecast.${index}.high`} 
+                          fallback={<Skeleton className="h-3 w-4" />}
+                        >
+                          {(high) => (
+                            <span className="font-medium">
+                              {Math.round(high as number)}°
+                            </span>
+                          )}
+                        </Stream.Field>
+                        
+                        <Stream.Field 
+                          path={`forecast.${index}.low`} 
+                          fallback={<Skeleton className="h-3 w-4" />}
+                        >
+                          {(low) => (
+                            <span className="text-muted-foreground">
+                              {Math.round(low as number)}°
+                            </span>
+                          )}
+                        </Stream.Field>
                       </div>
                     </div>
                   ))}

@@ -40,6 +40,22 @@ import type { StreamListProps } from "./types";
  * </Stream.List>
  * ```
  */
+/**
+ * Check if an item is empty/incomplete
+ */
+function isEmptyItem(item: unknown): boolean {
+  if (item === undefined || item === null) {
+    return true;
+  }
+  
+  // Empty object
+  if (typeof item === "object" && !Array.isArray(item)) {
+    return Object.keys(item).length === 0;
+  }
+  
+  return false;
+}
+
 export function StreamList<T = unknown>({
   path,
   fallback = null,
@@ -48,8 +64,8 @@ export function StreamList<T = unknown>({
   const { data } = useStreamContext();
   const value = getByPath<T[]>(data, path);
 
-  // Show fallback if array is undefined
-  if (value === undefined) {
+  // Show fallback if array is undefined or null
+  if (value === undefined || value === null) {
     return fallback;
   }
 
@@ -62,8 +78,13 @@ export function StreamList<T = unknown>({
     return fallback;
   }
 
-  // Filter out undefined items (partial array during streaming)
-  const validItems = value.filter((item): item is T => item !== undefined);
+  // Filter out undefined and empty items (partial array during streaming)
+  const validItems = value.filter((item): item is T => !isEmptyItem(item));
+  
+  // Show fallback if no valid items yet
+  if (validItems.length === 0) {
+    return fallback;
+  }
 
   // Render children with the valid items
   return children(validItems);

@@ -10,11 +10,32 @@ import { WeatherCard, weatherCardSchema } from "./weather-card";
 export function WeatherCardDemo() {
   const [inputValue, setInputValue] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement>(null);
+  
+  // 🔍 Logger: captura todos los estados de object
+  const historyRef = React.useRef<unknown[]>([]);
+  const prevIsLoadingRef = React.useRef(false);
 
   const { object, submit, isLoading, error } = useObject({
     api: "/api/stream/weather",
     schema: weatherCardSchema,
   });
+
+  // 🔍 Captura cada cambio y loguea al final
+  React.useEffect(() => {
+    // Guardar cada estado
+    historyRef.current.push(object ? JSON.parse(JSON.stringify(object)) : null);
+    
+    // Si terminó el stream (isLoading pasó de true a false)
+    if (prevIsLoadingRef.current && !isLoading) {
+      console.log("📊 Historial completo del stream:", historyRef.current);
+      console.log("📄 JSON final:", JSON.stringify(historyRef.current));
+      // Guardar en window para fácil acceso
+      (window as any).__STREAM_HISTORY__ = historyRef.current;
+      historyRef.current = []; // Reset para próximo stream
+    }
+    
+    prevIsLoadingRef.current = isLoading;
+  }, [object, isLoading]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();

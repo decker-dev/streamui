@@ -32,6 +32,28 @@ import type { StreamFieldProps } from "./types";
  * </Stream.Field>
  * ```
  */
+/**
+ * Check if a value should be considered "empty" or "not ready"
+ */
+function isEmptyValue(value: unknown): boolean {
+  // Undefined or null
+  if (value === undefined || value === null) {
+    return true;
+  }
+  
+  // Empty string
+  if (typeof value === "string" && value === "") {
+    return true;
+  }
+  
+  // Empty object (but allow objects with properties)
+  if (typeof value === "object" && !Array.isArray(value)) {
+    return Object.keys(value).length === 0;
+  }
+  
+  return false;
+}
+
 export function StreamField<T = unknown>({
   path,
   fallback = null,
@@ -40,12 +62,12 @@ export function StreamField<T = unknown>({
   const { data } = useStreamContext();
   const value = getByPath<T>(data, path);
 
-  // Show fallback if value is undefined
-  if (value === undefined) {
+  // Show fallback if value is empty/not ready
+  if (isEmptyValue(value)) {
     return fallback;
   }
 
-  // Render children with the value
-  return children(value);
+  // Render children with the value (we know it's not empty at this point)
+  return children(value as T);
 }
 
