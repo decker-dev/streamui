@@ -74,46 +74,27 @@ export function StreamFieldDemo() {
                 <div className="text-xs font-medium text-muted-foreground">
                   path="title"
                 </div>
-                <Stream.Field<string>
-                  path="title"
-                  fallback={<Skeleton className="h-8 w-40" />}
-                >
-                  {(title) => (
-                    <h2 className="text-2xl font-bold tracking-tight">
-                      {title}
-                    </h2>
-                  )}
-                </Stream.Field>
+                <div className="text-2xl font-bold tracking-tight">
+                  <Stream.Field path="title" fallback={<Skeleton className="h-8 w-40" />} />
+                </div>
               </div>
 
               <div className="space-y-1">
                 <div className="text-xs font-medium text-muted-foreground">
                   path="description"
                 </div>
-                <Stream.Field<string>
-                  path="description"
-                  fallback={<Skeleton className="h-5 w-56" />}
-                >
-                  {(description) => (
-                    <p className="text-muted-foreground">{description}</p>
-                  )}
-                </Stream.Field>
+                <div className="text-muted-foreground">
+                  <Stream.Field path="description" fallback={<Skeleton className="h-5 w-56" />} />
+                </div>
               </div>
 
               <div className="space-y-1">
                 <div className="text-xs font-medium text-muted-foreground">
                   path="value"
                 </div>
-                <Stream.Field<number>
-                  path="value"
-                  fallback={<Skeleton className="h-10 w-16" />}
-                >
-                  {(value) => (
-                    <span className="text-4xl font-bold tabular-nums">
-                      {value}
-                    </span>
-                  )}
-                </Stream.Field>
+                <div className="text-4xl font-bold tabular-nums">
+                  <Stream.Field path="value" fallback={<Skeleton className="h-10 w-16" />} />
+                </div>
               </div>
             </div>
           </Stream.Root>

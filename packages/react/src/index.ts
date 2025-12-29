@@ -17,9 +17,9 @@ import { StreamWhen } from "./stream-when";
  * 
  *   return (
  *     <Stream.Root data={object} isLoading={isLoading} error={error}>
- *       <Stream.Field path="title" fallback={<Skeleton />}>
- *         {(title) => <h1>{title}</h1>}
- *       </Stream.Field>
+ *       <h1>
+ *         <Stream.Field path="title" fallback={<Skeleton />} />
+ *       </h1>
  *       
  *       <Stream.List path="items" fallback={<ItemsSkeleton />}>
  *         {(items) => items.map(item => <Item key={item.id} {...item} />)}

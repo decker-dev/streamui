@@ -48,13 +48,11 @@ export interface StreamRootProps<T = unknown> {
 /**
  * Props for Stream.Field component.
  */
-export interface StreamFieldProps<T = unknown> {
+export interface StreamFieldProps {
   /** Path to the field using dot notation (e.g., "user.name" or "items.0.title") */
   path: string;
   /** Fallback to render while the field is undefined */
   fallback?: ReactNode;
-  /** Render function that receives the field value when available */
-  children: (value: T) => ReactNode;
 }
 
 /**

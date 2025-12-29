@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStreamSimulator } from "@/hooks/use-stream-simulator";
-import { cn } from "@/lib/cn";
 
 interface WeatherData {
   location?: string;
@@ -27,57 +26,39 @@ function ContextInspector({
 }: {
   state: "idle" | "loading" | "streaming" | "complete";
 }) {
-  const stateConfig = {
-    idle: { label: "idle", className: "bg-muted text-muted-foreground" },
-    loading: { label: "loading", className: "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" },
-    streaming: { label: "streaming", className: "bg-blue-500/20 text-blue-600 dark:text-blue-400" },
-    complete: { label: "complete", className: "bg-green-500/20 text-green-600 dark:text-green-400" },
+  const stateColors = {
+    idle: "bg-muted text-muted-foreground",
+    loading: "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400",
+    streaming: "bg-blue-500/20 text-blue-600 dark:text-blue-400",
+    complete: "bg-green-500/20 text-green-600 dark:text-green-400",
   };
-
-  const { label, className } = stateConfig[state];
 
   return (
     <Card className="py-0">
       <CardContent className="p-3 font-mono text-xs">
-        <div className="text-[10px] font-sans font-medium uppercase tracking-wider text-muted-foreground mb-3">
+        <div className="mb-2 font-sans text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
           Context State
         </div>
-        <div className="space-y-2">
-          <Row label="state">
-            <Badge variant="outline" className={className}>
-              {label}
-            </Badge>
-          </Row>
-          <Stream.Field<string>
-            path="location"
-            fallback={<Row label="location"><span className="text-muted-foreground/50">undefined</span></Row>}
-          >
-            {(location) => <Row label="location">"{location}"</Row>}
-          </Stream.Field>
-          <Stream.Field<number>
-            path="temperature"
-            fallback={<Row label="temperature"><span className="text-muted-foreground/50">undefined</span></Row>}
-          >
-            {(temp) => <Row label="temperature">{temp}</Row>}
-          </Stream.Field>
-          <Stream.Field<string>
-            path="condition"
-            fallback={<Row label="condition"><span className="text-muted-foreground/50">undefined</span></Row>}
-          >
-            {(condition) => <Row label="condition">"{condition}"</Row>}
-          </Stream.Field>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">state:</span>
+            <Badge variant="outline" className={stateColors[state]}>{state}</Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">location:</span>
+            <Stream.Field path="location" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">temperature:</span>
+            <Stream.Field path="temperature" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">condition:</span>
+            <Stream.Field path="condition" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+          </div>
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2 h-5">
-      <span className="text-muted-foreground">{label}:</span>
-      <span className="text-foreground">{children}</span>
-    </div>
   );
 }
 
@@ -86,14 +67,14 @@ export function StreamRootDemo() {
     useStreamSimulator({ sequence: STREAM_SEQUENCE, delay: 800 });
 
   const isStreaming = isLoading && data !== undefined;
+  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
 
-  const currentState = isComplete
-    ? "complete"
-    : isStreaming
-      ? "streaming"
-      : isLoading
-        ? "loading"
-        : "idle";
+  const borderColors = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+  };
 
   return (
     <div className="flex w-full max-w-md flex-col gap-3">
@@ -116,49 +97,25 @@ export function StreamRootDemo() {
 
       <Stream.Root data={data} isLoading={isLoading}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Card
-            className={cn(
-              "transition-colors duration-300 py-0",
-              isStreaming && "border-blue-500",
-              isComplete && "border-green-500"
-            )}
-          >
+          <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
             <CardContent className="p-3 font-mono text-xs">
-              <div className="text-[10px] font-sans font-medium uppercase tracking-wider text-muted-foreground mb-3">
+              <div className="mb-2 font-sans text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 Rendered UI
               </div>
-              <div className="space-y-2">
-                <div className="h-5 flex items-center">
-                  <Stream.Field<string>
-                    path="location"
-                    fallback={<Skeleton className="h-3 w-12" />}
-                  >
-                    {(location) => (
-                      <span className="font-semibold">{location}</span>
-                    )}
-                  </Stream.Field>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">location:</span>
+                  <Stream.Field path="location" fallback={<Skeleton className="h-3 w-10" />} />
                 </div>
-
-                <div className="h-5 flex items-center">
-                  <Stream.Field<number>
-                    path="temperature"
-                    fallback={<Skeleton className="h-3 w-8" />}
-                  >
-                    {(temp) => (
-                      <span className="font-bold tabular-nums">{temp}°</span>
-                    )}
-                  </Stream.Field>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">temperature:</span>
+                  <Stream.Field path="temperature" fallback={<Skeleton className="h-3 w-6" />} />
+                  <Stream.When streaming>°</Stream.When>
+                  <Stream.When complete>°</Stream.When>
                 </div>
-
-                <div className="h-5 flex items-center">
-                  <Stream.Field<string>
-                    path="condition"
-                    fallback={<Skeleton className="h-3 w-10" />}
-                  >
-                    {(condition) => (
-                      <span className="text-muted-foreground">{condition}</span>
-                    )}
-                  </Stream.Field>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">condition:</span>
+                  <Stream.Field path="condition" fallback={<Skeleton className="h-3 w-10" />} />
                 </div>
               </div>
             </CardContent>
