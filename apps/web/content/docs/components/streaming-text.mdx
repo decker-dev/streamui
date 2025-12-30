@@ -3,11 +3,14 @@ title: Streaming Text
 description: Display text with an animated cursor while streaming from AI.
 ---
 
+import { StreamingText } from "@/registry/stream/streaming-text";
+import { StreamingTextDemo } from "@/registry/stream/streaming-text-demo";
+
 A simple component that shows a blinking cursor at the end of text while content is being streamed from an AI model. Supports smooth character-by-character rendering for a typewriter effect.
 
-## Demo
-
-<ComponentPreview animated code={`"use client";
+<ComponentPreview
+  animated
+  code={`"use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { MessageSquare } from "lucide-react";
@@ -69,17 +72,14 @@ export function StreamingTextDemo() {
       </div>
     </div>
   );
-}`}>
+}`}
+>
   <StreamingTextDemo />
 </ComponentPreview>
 
 ## Installation
 
-<Steps>
-  <Step>
-    ### Copy the component
-
-```tsx title="streaming-text.tsx"
+```tsx title="components/ui/streaming-text.tsx"
 "use client";
 
 import * as React from "react";
@@ -174,141 +174,115 @@ export function StreamingText({
 }
 ```
 
-  </Step>
-</Steps>
-
-## Usage
-
-### With useObject
-
-```tsx
-"use client";
-
-import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { StreamingText } from "@/components/ui/streaming-text";
-
-export function StreamingResponse() {
-  const { object, isLoading, submit } = useObject({
-    api: "/api/stream/text",
-    schema: yourSchema,
-  });
-
-  return (
-    <StreamingText streaming={isLoading} smooth>
-      {object?.text ?? ""}
-    </StreamingText>
-  );
-}
-```
-
-### With useCompletion
-
-```tsx
-"use client";
-
-import { useCompletion } from "@ai-sdk/react";
-import { StreamingText } from "@/components/ui/streaming-text";
-
-export function ChatResponse() {
-  const { completion, isLoading } = useCompletion({
-    api: "/api/completion",
-  });
-
-  return (
-    <StreamingText streaming={isLoading}>
-      {completion}
-    </StreamingText>
-  );
-}
-```
-
-### With useChat
-
-```tsx
-"use client";
-
-import { useChat } from "@ai-sdk/react";
-import { StreamingText } from "@/components/ui/streaming-text";
-
-export function ChatMessage({ message, isStreaming }) {
-  return (
-    <div className="rounded-lg border p-4">
-      <StreamingText streaming={isStreaming}>
-        {message.content}
-      </StreamingText>
-    </div>
-  );
-}
-```
-
 ## Examples
 
 ### Smooth Typewriter Effect
 
 Enable smooth character-by-character rendering for a typewriter effect:
 
-```tsx
-<StreamingText streaming={isLoading} smooth>
+<ComponentPreview
+  animated
+  code={`<StreamingText streaming smooth>
   {text}
-</StreamingText>
-```
+</StreamingText>`}
+>
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText streaming smooth>
+      {"React is a JavaScript library for building user interfaces. It was developed by Facebook and is now maintained by Meta and a community of developers."}
+    </StreamingText>
+  </div>
+</ComponentPreview>
 
 ### Custom Speed
 
-Control how many characters appear per animation frame:
+Control how many characters appear per animation frame with the `speed` prop:
 
-```tsx
-<StreamingText streaming={isLoading} smooth speed={4}>
+<ComponentPreview
+  animated
+  code={`<StreamingText streaming smooth speed={4}>
   {text}
-</StreamingText>
-```
+</StreamingText>`}
+>
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText streaming smooth speed={4}>
+      {"This text appears faster because we increased the speed prop to 4 characters per frame instead of the default 2."}
+    </StreamingText>
+  </div>
+</ComponentPreview>
 
 ### Custom Cursor
 
-```tsx
-<StreamingText streaming={isLoading} cursor="●">
+Use different cursor characters with the `cursor` prop:
+
+<ComponentPreview
+  code={`<StreamingText streaming cursor="●">
   {text}
-</StreamingText>
-```
+</StreamingText>`}
+>
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText streaming cursor="●">
+      {"Streaming data allows for real-time updates and progressive rendering of content."}
+    </StreamingText>
+  </div>
+</ComponentPreview>
+
+### Block Cursor
+
+<ComponentPreview
+  code={`<StreamingText streaming cursor="█">
+  {text}
+</StreamingText>`}
+>
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText streaming cursor="█">
+      {"Next.js is a React framework that enables server-side rendering and static site generation."}
+    </StreamingText>
+  </div>
+</ComponentPreview>
 
 ### Custom Styling
 
-```tsx
-<StreamingText 
-  streaming={isLoading}
+Style the text and cursor independently with `className` and `cursorClassName`:
+
+<ComponentPreview
+  code={`<StreamingText 
+  streaming
   className="font-mono text-sm"
   cursorClassName="text-blue-500"
 >
   {text}
-</StreamingText>
-```
-
-### Block Cursor
-
-```tsx
-<StreamingText 
-  streaming={isLoading}
-  cursor="█"
-  cursorClassName="animate-blink"
+</StreamingText>`}
 >
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText 
+      streaming
+      className="font-mono text-sm"
+      cursorClassName="text-blue-500"
+    >
+      {"const greeting = 'Hello, World!';\nconsole.log(greeting);"}
+    </StreamingText>
+  </div>
+</ComponentPreview>
+
+### Static Text (No Cursor)
+
+When `streaming` is `false`, the cursor is hidden:
+
+<ComponentPreview
+  code={`<StreamingText streaming={false}>
   {text}
-</StreamingText>
-```
-
-Add custom blink animation in your CSS:
-
-```css
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-
-.animate-blink {
-  animation: blink 1s step-end infinite;
-}
-```
+</StreamingText>`}
+>
+  <div className="rounded-xl border bg-card p-4 min-h-[80px]">
+    <StreamingText streaming={false}>
+      {"This text appears without a cursor because streaming is disabled."}
+    </StreamingText>
+  </div>
+</ComponentPreview>
 
 ## API Reference
+
+### StreamingText
 
 | Prop | Type | Default |
 | --- | --- | --- |
