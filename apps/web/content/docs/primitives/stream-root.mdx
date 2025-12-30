@@ -55,6 +55,14 @@ import { Stream } from "@stream.ui/react";
 </Stream.Root>
 ```
 
+## How It Works
+
+`Stream.Root` creates a React context that all child primitives can access:
+
+1. Pass `data`, `isLoading`, and `error` from your streaming hook (e.g., `useObject`)
+2. The component derives the current state from these props
+3. Child components (`Stream.Field`, `Stream.List`, `Stream.When`) read this context to behave accordingly
+
 ## States
 
 `Stream.Root` derives the current state from its props:

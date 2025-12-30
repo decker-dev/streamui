@@ -19,8 +19,8 @@ import { Stream } from "@stream.ui/react";
 <Stream.Root data={object} isLoading={isLoading} error={error}>
   <div className="relative rounded-2xl border bg-card p-6">
     {/* Content */}
-    <Stream.Field path="title">
-      {(title) => <h1>{title}</h1>}
+    <Stream.Field fallback={<Skeleton />}>
+      <h1>{object?.title}</h1>
     </Stream.Field>
 
     {/* Loading indicator */}
@@ -166,6 +166,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 </Stream.Root>
 ```
 
+## How It Works
+
+`Stream.When` reads the current state from `Stream.Root` context and renders its children only when the specified state is active:
+
+1. Pass one of `loading`, `streaming`, `complete`, or `error` as a prop
+2. The component checks the current stream state from context
+3. If the state matches, children are rendered
+4. For `error` state, children can be a function that receives the error object
+
+## States
+
+| State | When Active |
+| --- | --- |
+| `loading` | `isLoading && !data` — Waiting for initial data |
+| `streaming` | `isLoading && data` — Data arriving incrementally |
+| `complete` | `!isLoading && data` — All data received |
+| `error` | `error` exists — An error occurred |
+
 ## API Reference
 
 ### Props
@@ -177,13 +195,4 @@ import { Skeleton } from "@/components/ui/skeleton";
 | `complete` | `boolean` | — |
 | `error` | `boolean` | — |
 | `children` | `ReactNode \| ((error: Error) => ReactNode)` | — |
-
-### States
-
-| State | When Active |
-| --- | --- |
-| `loading` | `isLoading && !data` — Waiting for initial data |
-| `streaming` | `isLoading && data` — Data arriving incrementally |
-| `complete` | `!isLoading && data` — All data received |
-| `error` | `error` exists — An error occurred |
 

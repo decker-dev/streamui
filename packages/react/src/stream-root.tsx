@@ -41,8 +41,8 @@ function deriveStreamState<T>(
  * const { object, isLoading, error } = useObject({ ... });
  *
  * <Stream.Root data={object} isLoading={isLoading} error={error}>
- *   <Stream.Field path="title">
- *     {(title) => <h1>{title}</h1>}
+ *   <Stream.Field fallback={<Skeleton />}>
+ *     <h1>{object?.title}</h1>
  *   </Stream.Field>
  * </Stream.Root>
  * ```
