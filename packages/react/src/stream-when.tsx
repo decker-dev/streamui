@@ -4,32 +4,32 @@ import type { StreamWhenProps } from "./types";
 
 /**
  * Stream.When - Conditionally renders content based on stream state.
- * 
+ *
  * Use this to show different UI based on whether the stream is
  * loading, streaming, complete, or has errored.
- * 
+ *
  * @example
  * ```tsx
  * // Show spinner while loading (no data yet)
  * <Stream.When loading>
  *   <Spinner />
  * </Stream.When>
- * 
+ *
  * // Show indicator while actively streaming
  * <Stream.When streaming>
  *   <PulsingDot />
  * </Stream.When>
- * 
+ *
  * // Show success indicator when complete
  * <Stream.When complete>
  *   <CheckIcon />
  * </Stream.When>
- * 
+ *
  * // Handle errors with render function to access error details
  * <Stream.When error>
  *   {(err) => <ErrorMessage message={err.message} />}
  * </Stream.When>
- * 
+ *
  * // Simple error display
  * <Stream.When error>
  *   <p>Something went wrong</p>
@@ -64,4 +64,3 @@ export function StreamWhen({
   // For all other cases, render children directly
   return <>{children}</>;
 }
-

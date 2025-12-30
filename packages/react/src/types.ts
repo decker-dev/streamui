@@ -11,7 +11,12 @@ export type DeepPartial<T> = T extends object
 /**
  * Possible states of a streaming data flow.
  */
-export type StreamState = "idle" | "loading" | "streaming" | "complete" | "error";
+export type StreamState =
+  | "idle"
+  | "loading"
+  | "streaming"
+  | "complete"
+  | "error";
 
 /**
  * Context value provided by Stream.Root to all children.

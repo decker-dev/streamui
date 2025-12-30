@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { MessageSquare, RefreshCw } from "lucide-react";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { StreamingText } from "./streaming-text";
 import { streamingTextSchema } from "./streaming-text-schema";
@@ -49,7 +49,9 @@ export function StreamingTextDemo() {
         {presets.map((preset) => (
           <Button
             key={preset.label}
-            variant={selectedPreset.label === preset.label ? "default" : "outline"}
+            variant={
+              selectedPreset.label === preset.label ? "default" : "outline"
+            }
             size="sm"
             onClick={() => handlePreset(preset)}
             disabled={isLoading}
@@ -66,7 +68,9 @@ export function StreamingTextDemo() {
           disabled={isLoading}
           className="gap-1.5"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>

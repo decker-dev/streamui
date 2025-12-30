@@ -48,7 +48,13 @@ export function StreamFieldDemo() {
   } = useStreamSimulator({ sequence: STREAM_SEQUENCE, delay: 80 });
 
   const isStreaming = isLoading && data !== undefined;
-  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
+  const currentState = isComplete
+    ? "complete"
+    : isStreaming
+      ? "streaming"
+      : isLoading
+        ? "loading"
+        : "idle";
 
   const borderColors = {
     idle: "",

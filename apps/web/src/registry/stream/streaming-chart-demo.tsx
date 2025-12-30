@@ -47,17 +47,25 @@ export function StreamingChartDemo() {
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <StreamingChart data={object ?? undefined} isLoading={isLoading} error={error ?? undefined} />
+      <StreamingChart
+        data={object ?? undefined}
+        isLoading={isLoading}
+        error={error ?? undefined}
+      />
 
       {error && (
-        <p className="text-center text-sm text-destructive">Error: {error.message}</p>
+        <p className="text-center text-sm text-destructive">
+          Error: {error.message}
+        </p>
       )}
 
       <div className="flex flex-wrap items-center justify-center gap-2">
         {presets.map((preset) => (
           <Button
             key={preset.label}
-            variant={selectedPreset.label === preset.label ? "default" : "outline"}
+            variant={
+              selectedPreset.label === preset.label ? "default" : "outline"
+            }
             size="sm"
             onClick={() => handlePreset(preset)}
             disabled={isLoading}
@@ -74,7 +82,9 @@ export function StreamingChartDemo() {
           disabled={isLoading}
           className="gap-1.5"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>

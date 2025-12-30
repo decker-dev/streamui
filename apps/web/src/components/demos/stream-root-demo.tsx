@@ -44,25 +44,39 @@ function ContextInspector({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">location:</span>
-            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+            <Stream.Field
+              fallback={
+                <span className="text-muted-foreground/50">undefined</span>
+              }
+            >
               {data?.location}
             </Stream.Field>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">temperature:</span>
-            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+            <Stream.Field
+              fallback={
+                <span className="text-muted-foreground/50">undefined</span>
+              }
+            >
               {data?.temperature}
             </Stream.Field>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">condition:</span>
-            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+            <Stream.Field
+              fallback={
+                <span className="text-muted-foreground/50">undefined</span>
+              }
+            >
               {data?.condition}
             </Stream.Field>
           </div>
           <div className="flex items-center gap-2 pt-1">
             <span className="text-muted-foreground">state:</span>
-            <Badge variant="outline" className={stateColors[state]}>{state}</Badge>
+            <Badge variant="outline" className={stateColors[state]}>
+              {state}
+            </Badge>
           </div>
         </div>
       </CardContent>
@@ -71,11 +85,25 @@ function ContextInspector({
 }
 
 export function StreamRootDemo() {
-  const { data, isLoading, step, totalSteps, isIdle, isComplete, start, reset } =
-    useStreamSimulator({ sequence: STREAM_SEQUENCE, delay: 800 });
+  const {
+    data,
+    isLoading,
+    step,
+    totalSteps,
+    isIdle,
+    isComplete,
+    start,
+    reset,
+  } = useStreamSimulator({ sequence: STREAM_SEQUENCE, delay: 800 });
 
   const isStreaming = isLoading && data !== undefined;
-  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
+  const currentState = isComplete
+    ? "complete"
+    : isStreaming
+      ? "streaming"
+      : isLoading
+        ? "loading"
+        : "idle";
 
   const borderColors = {
     idle: "",
@@ -105,7 +133,9 @@ export function StreamRootDemo() {
 
       <Stream.Root data={data} isLoading={isLoading}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
+          <Card
+            className={`py-0 transition-colors ${borderColors[currentState]}`}
+          >
             <CardContent className="p-3 font-mono text-xs">
               <div className="mb-2 font-sans text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 Rendered UI

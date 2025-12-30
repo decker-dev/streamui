@@ -1,6 +1,11 @@
 import { useMemo } from "react";
 import { StreamContext } from "./context";
-import type { DeepPartial, StreamContextValue, StreamRootProps, StreamState } from "./types";
+import type {
+  DeepPartial,
+  StreamContextValue,
+  StreamRootProps,
+  StreamState,
+} from "./types";
 
 /**
  * Derives the stream state from the current data and loading status.
@@ -8,7 +13,7 @@ import type { DeepPartial, StreamContextValue, StreamRootProps, StreamState } fr
 function deriveStreamState<T>(
   data: DeepPartial<T> | undefined,
   isLoading: boolean,
-  error: Error | undefined
+  error: Error | undefined,
 ): StreamState {
   if (error) {
     return "error";
@@ -27,14 +32,14 @@ function deriveStreamState<T>(
 
 /**
  * Stream.Root - The root component that provides streaming context.
- * 
+ *
  * Wrap your streaming UI with this component and pass the data from
  * useObject or similar streaming hooks.
- * 
+ *
  * @example
  * ```tsx
  * const { object, isLoading, error } = useObject({ ... });
- * 
+ *
  * <Stream.Root data={object} isLoading={isLoading} error={error}>
  *   <Stream.Field path="title">
  *     {(title) => <h1>{title}</h1>}
@@ -59,7 +64,7 @@ export function StreamRoot<T = unknown>({
       isComplete: state === "complete",
       error,
     }),
-    [data, state, error]
+    [data, state, error],
   );
 
   return (
@@ -68,4 +73,3 @@ export function StreamRoot<T = unknown>({
     </StreamContext.Provider>
   );
 }
-

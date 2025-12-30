@@ -1,7 +1,7 @@
 "use client";
 
-import { Stream } from "@stream.ui/react";
 import type { DeepPartial } from "@stream.ui/react";
+import { Stream } from "@stream.ui/react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import * as React from "react";
@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -111,7 +111,11 @@ interface StreamingChartProps {
   error?: Error;
 }
 
-export function StreamingChart({ data, isLoading, error }: StreamingChartProps) {
+export function StreamingChart({
+  data,
+  isLoading,
+  error,
+}: StreamingChartProps) {
   const isStreaming = isLoading && data !== undefined;
   const isComplete = !isLoading && data !== undefined;
   const currentState = isComplete
@@ -130,7 +134,9 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
   };
 
   // Get valid chart data items (filter out incomplete ones)
-  const rawChartData = data?.data as Array<{ label?: string; value?: number }> | undefined;
+  const rawChartData = data?.data as
+    | Array<{ label?: string; value?: number }>
+    | undefined;
   const validChartData = React.useMemo(() => {
     if (!rawChartData) return [];
     return rawChartData.filter(
@@ -139,7 +145,7 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
         item !== undefined &&
         typeof item.label === "string" &&
         item.label !== "" &&
-        typeof item.value === "number"
+        typeof item.value === "number",
     );
   }, [rawChartData]);
 
@@ -158,7 +164,10 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
       // Initial loading state - show single placeholder bar
       return [{ label: "", value: 50000, isPlaceholder: true }];
     }
-    return [...validChartData, { label: "", value: avgValue, isPlaceholder: true }];
+    return [
+      ...validChartData,
+      { label: "", value: avgValue, isPlaceholder: true },
+    ];
   }, [validChartData, isLoading, avgValue]);
 
   const change = data?.change as number | undefined;
@@ -170,7 +179,12 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
 
   return (
     <Stream.Root data={data} isLoading={isLoading} error={error}>
-      <Card className={cn("w-full max-w-md transition-colors", borderColors[currentState])}>
+      <Card
+        className={cn(
+          "w-full max-w-md transition-colors",
+          borderColors[currentState],
+        )}
+      >
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle>

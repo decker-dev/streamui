@@ -3,19 +3,19 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { TypeTable } from "fumadocs-ui/components/type-table";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
-import { ComponentPreview } from "@/components/docs/component-preview";
-import { DemoPreview } from "@/components/docs/demo-preview";
 import {
   StreamFieldDemo,
   StreamListDemo,
-  StreamWhenDemo,
   StreamRootDemo,
+  StreamWhenDemo,
 } from "@/components/demos";
+import { ComponentPreview } from "@/components/docs/component-preview";
+import { DemoPreview } from "@/components/docs/demo-preview";
 import {
-  StreamingText,
-  StreamingTextDemo,
   StreamingChart,
   StreamingChartDemo,
+  StreamingText,
+  StreamingTextDemo,
 } from "@/registry/stream";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {

@@ -58,7 +58,7 @@ export function useStreamSimulator<T>({
       setStep(index);
       timeoutRef.current = setTimeout(() => runStep(index + 1), delay);
     },
-    [sequence, delay]
+    [sequence, delay],
   );
 
   const start = React.useCallback(() => {
@@ -93,4 +93,3 @@ export function useStreamSimulator<T>({
     reset,
   };
 }
-

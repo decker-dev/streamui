@@ -1,4 +1,10 @@
 {
   "title": "Documentation",
-  "pages": ["index", "---Primitives---", "...primitives", "---Components---", "...components"]
+  "pages": [
+    "index",
+    "---Primitives---",
+    "...primitives",
+    "---Components---",
+    "...components"
+  ]
 }

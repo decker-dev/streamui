@@ -30,4 +30,3 @@ The value should typically be the most recent data point or a meaningful aggrega
 
   return result.toTextStreamResponse();
 }
-

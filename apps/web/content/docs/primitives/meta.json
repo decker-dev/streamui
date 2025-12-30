@@ -1,5 +1,10 @@
 {
   "title": "Primitives",
-  "pages": ["index", "stream-root", "stream-field", "stream-list", "stream-when"]
+  "pages": [
+    "index",
+    "stream-root",
+    "stream-field",
+    "stream-list",
+    "stream-when"
+  ]
 }
-

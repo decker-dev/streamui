@@ -97,12 +97,19 @@ export function StreamListDemo() {
     setItemCount(0);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: cleanup on unmount only
   React.useEffect(() => cleanup, []);
 
   const isComplete = !isLoading && data !== undefined;
   const isIdle = !isLoading && data === undefined;
   const isStreaming = isLoading && data !== undefined;
-  const currentState = isComplete ? "complete" : isStreaming ? "streaming" : isLoading ? "loading" : "idle";
+  const currentState = isComplete
+    ? "complete"
+    : isStreaming
+      ? "streaming"
+      : isLoading
+        ? "loading"
+        : "idle";
 
   const borderColors = {
     idle: "",

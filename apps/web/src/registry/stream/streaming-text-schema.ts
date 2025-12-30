@@ -5,4 +5,3 @@ export const streamingTextSchema = z.object({
 });
 
 export type StreamingTextData = z.infer<typeof streamingTextSchema>;
-

@@ -20,4 +20,3 @@ Return your response in the text field.`,
 
   return result.toTextStreamResponse();
 }
-

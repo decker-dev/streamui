@@ -65,6 +65,7 @@ export function StreamWhenDemo() {
     setCurrentState("idle");
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: cleanup on unmount only
   React.useEffect(() => cleanup, []);
 
   const borderColors: Record<DemoState, string> = {
@@ -79,7 +80,11 @@ export function StreamWhenDemo() {
     <div className="flex w-full max-w-md flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={() => runSequence(false)} disabled={isLoading}>
+          <Button
+            size="sm"
+            onClick={() => runSequence(false)}
+            disabled={isLoading}
+          >
             <Play className="h-3.5 w-3.5" />
             Success
           </Button>

@@ -5,7 +5,9 @@ export const streamingChartSchema = z.object({
   value: z.number().describe("Current highlighted value"),
   unit: z.string().describe("Value unit (e.g., '$', '€', 'users')"),
   change: z.number().describe("Percentage change vs previous period"),
-  changeLabel: z.string().describe("Label for change (e.g., 'vs. last quarter')"),
+  changeLabel: z
+    .string()
+    .describe("Label for change (e.g., 'vs. last quarter')"),
   data: z
     .array(
       z.object({
@@ -17,4 +19,3 @@ export const streamingChartSchema = z.object({
 });
 
 export type StreamingChartData = z.infer<typeof streamingChartSchema>;
-

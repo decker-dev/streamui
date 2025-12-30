@@ -27,7 +27,7 @@ function useSmoothText(
   text: string,
   enabled: boolean,
   charsPerTick = 2,
-  tickMs = 16
+  tickMs = 16,
 ) {
   const [displayedLength, setDisplayedLength] = React.useState(0);
   const targetLengthRef = React.useRef(0);
@@ -107,10 +107,7 @@ export function StreamingText({
       {displayedText}
       {(streaming || isAnimating) && (
         <span
-          className={cn(
-            "ml-0.5 inline-block animate-pulse",
-            cursorClassName
-          )}
+          className={cn("ml-0.5 inline-block animate-pulse", cursorClassName)}
           aria-hidden="true"
         >
           {cursor}
@@ -119,4 +116,3 @@ export function StreamingText({
     </span>
   );
 }
-

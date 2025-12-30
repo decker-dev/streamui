@@ -40,7 +40,6 @@ import {
   SidebarTrigger,
   SidebarViewport,
 } from "./sidebar";
-import { SidebarExternalLinks } from "./sidebar-external-links";
 
 export interface DocsLayoutProps extends BaseLayoutProps {
   tree: PageTree.Root;
