@@ -42,7 +42,7 @@ export function StreamingTextDemo() {
             Ask something to see streaming text…
           </span>
         ) : (
-          <StreamingText streaming={isLoading}>
+          <StreamingText streaming={isLoading} smooth>
             {object?.text ?? ""}
           </StreamingText>
         )}
