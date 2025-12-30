@@ -16,26 +16,13 @@ const presets = [
 
 export function StreamingChartDemo() {
   const [selectedPreset, setSelectedPreset] = React.useState(presets[0]);
-  const statesRef = React.useRef<unknown[]>([]);
 
   const { object, submit, isLoading, error } = useObject({
     api: "/api/stream/chart",
     schema: streamingChartSchema,
   });
 
-  // Track all states during streaming
-  React.useEffect(() => {
-    statesRef.current.push(structuredClone(object));
-
-    if (!isLoading && statesRef.current.length > 1) {
-      console.log(JSON.stringify(statesRef.current));
-      statesRef.current = [];
-    }
-  }, [object, isLoading]);
-
-  // Reset states when starting new request
   const handlePreset = (preset: (typeof presets)[number]) => {
-    statesRef.current = [];
     setSelectedPreset(preset);
     submit({ prompt: preset.prompt });
   };
