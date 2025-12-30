@@ -1,7 +1,7 @@
 "use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { BarChart3, RefreshCw } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { StreamingChart } from "./streaming-chart";
@@ -40,11 +40,6 @@ export function StreamingChartDemo() {
     submit({ prompt: preset.prompt });
   };
 
-  const handleRefresh = () => {
-    statesRef.current = [];
-    submit({ prompt: selectedPreset.prompt });
-  };
-
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
       <StreamingChart
@@ -75,18 +70,6 @@ export function StreamingChartDemo() {
             {preset.label}
           </Button>
         ))}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={isLoading}
-          className="gap-1.5"
-        >
-          <RefreshCw
-            className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </Button>
       </div>
     </div>
   );

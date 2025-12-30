@@ -17,6 +17,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "lint": "biome check",
     "clean": "rm -rf dist"
   },
   "peerDependencies": {

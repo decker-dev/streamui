@@ -1,4 +1,4 @@
-import { isValidElement, type ReactNode, Children } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
 import type { StreamListProps } from "./types";
 
 /**

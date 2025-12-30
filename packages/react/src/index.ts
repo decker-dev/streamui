@@ -1,6 +1,6 @@
-import { StreamRoot } from "./stream-root";
 import { StreamField } from "./stream-field";
 import { StreamList } from "./stream-list";
+import { StreamRoot } from "./stream-root";
 import { StreamWhen } from "./stream-when";
 
 /**
@@ -53,10 +53,10 @@ export { StreamRoot, StreamField, StreamList, StreamWhen };
 
 export type {
   DeepPartial,
-  StreamState,
   StreamContextValue,
-  StreamRootProps,
   StreamFieldProps,
   StreamListProps,
+  StreamRootProps,
+  StreamState,
   StreamWhenProps,
 } from "./types";
