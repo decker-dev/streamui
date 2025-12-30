@@ -3,19 +3,21 @@ title: Streaming Chart
 description: An animated bar chart component that streams data from AI with smooth reveal animations.
 ---
 
+import { StreamingChart } from "@/registry/stream/streaming-chart";
+import { StreamingChartDemo } from "@/registry/stream/streaming-chart-demo";
+
 A bar chart component that progressively reveals data as it streams from AI, with interactive hover states and animated value displays.
 
-## Demo
-
-
-<ComponentPreview animated code={`"use client";
+<ComponentPreview
+  animated
+  code={`"use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { BarChart3 } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { StreamingChart } from "./streaming-chart";
-import { streamingChartSchema } from "./streaming-chart-schema";
+import { StreamingChart } from "@/components/ui/streaming-chart";
+import { streamingChartSchema } from "@/components/ui/streaming-chart-schema";
 
 const presets = [
   { label: "Revenue", prompt: "Monthly revenue for a SaaS company in 2024" },
@@ -70,32 +72,20 @@ export function StreamingChartDemo() {
       </div>
     </div>
   );
-}
-`}>
+}`}
+>
   <StreamingChartDemo />
 </ComponentPreview>
 
 ## Installation
 
-<Steps>
-  <Step>
-    ### Install dependencies
-
 ```bash
 npm install @stream.ui/react recharts lucide-react motion
 ```
 
-  </Step>
-  <Step>
-    ### Add shadcn/ui components
-
 ```bash
 npx shadcn@latest add badge card chart skeleton
 ```
-
-  </Step>
-  <Step>
-    ### Copy the schema
 
 ```tsx title="streaming-chart-schema.ts"
 import { z } from "zod";
@@ -118,10 +108,6 @@ export const streamingChartSchema = z.object({
 
 export type StreamingChartData = z.infer<typeof streamingChartSchema>;
 ```
-
-  </Step>
-  <Step>
-    ### Copy the component
 
 ```tsx title="streaming-chart.tsx"
 "use client";
@@ -422,10 +408,6 @@ export function StreamingChart({
 }
 ```
 
-  </Step>
-  <Step>
-    ### Create the API route
-
 ```tsx title="app/api/stream/chart/route.ts"
 import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
@@ -452,50 +434,9 @@ Always include:
 }
 ```
 
-  </Step>
-</Steps>
-
-## Usage
-
-```tsx
-"use client";
-
-import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { StreamingChart } from "@/components/ui/streaming-chart";
-import { streamingChartSchema } from "@/components/ui/streaming-chart-schema";
-
-export function MyChartWidget() {
-  const { object, submit, isLoading, error } = useObject({
-    api: "/api/stream/chart",
-    schema: streamingChartSchema,
-  });
-
-  return (
-    <div>
-      <StreamingChart
-        data={object ?? undefined}
-        isLoading={isLoading}
-        error={error ?? undefined}
-      />
-      <button onClick={() => submit({ prompt: "Monthly revenue for 2024" })}>
-        Generate Revenue Chart
-      </button>
-    </div>
-  );
-}
-```
-
-## Features
-
-- **Progressive Loading**: Skeleton placeholders while data streams
-- **Trend Indicator**: Badge shows positive/negative change with appropriate colors
-- **State Indicators**: Border color changes based on streaming state (loading → streaming → complete)
-- **Monospace Numbers**: Tabular figures for proper number alignment
-- **Animated Values**: Smooth blur-in animation when values update
-
 ## API Reference
 
-### StreamingChart Props
+### StreamingChart
 
 | Prop | Type | Default |
 | --- | --- | --- |
