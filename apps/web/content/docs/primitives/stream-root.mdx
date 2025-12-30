@@ -17,21 +17,21 @@ description: The root component that provides streaming context to all children.
 import { Stream } from "@stream.ui/react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 
-function WeatherCard() {
+function ArticleCard() {
   const { object, isLoading, error } = useObject({
-    api: "/api/weather",
-    schema: weatherSchema,
+    api: "/api/article",
+    schema: articleSchema,
   });
 
   return (
     <Stream.Root data={object} isLoading={isLoading} error={error}>
       <div className="rounded-2xl border bg-card p-6">
         <Stream.Field fallback={<Skeleton className="h-6 w-32" />}>
-          <h3 className="text-lg font-semibold">{object?.location}</h3>
+          <h3 className="text-lg font-semibold">{object?.title}</h3>
         </Stream.Field>
         
         <Stream.Field fallback={<Skeleton className="h-12 w-20" />}>
-          <span className="text-5xl font-bold">{object?.temperature}°</span>
+          <p className="text-muted-foreground">{object?.summary}</p>
         </Stream.Field>
         
         <Stream.When streaming>

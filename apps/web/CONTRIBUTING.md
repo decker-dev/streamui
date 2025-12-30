@@ -93,9 +93,9 @@ We use a registry system for developing components. You can find the source code
 ```
 src/registry/
 └── stream/
-    ├── weather-card.tsx
-    ├── weather-card-schema.ts
-    └── weather-card-demo.tsx
+    ├── streaming-text.tsx
+    ├── streaming-text-schema.ts
+    └── streaming-text-demo.tsx
 ```
 
 When adding or modifying components, please ensure that:

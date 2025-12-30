@@ -8,13 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStreamSimulator } from "@/hooks/use-stream-simulator";
 
-interface WeatherData {
+interface DemoData {
   location?: string;
   temperature?: number;
   condition?: string;
 }
 
-const STREAM_SEQUENCE: WeatherData[] = [
+const STREAM_SEQUENCE: DemoData[] = [
   {},
   { location: "Tokyo" },
   { location: "Tokyo", temperature: 22 },
@@ -25,7 +25,7 @@ function ContextInspector({
   data,
   state,
 }: {
-  data: WeatherData | undefined;
+  data: DemoData | undefined;
   state: "idle" | "loading" | "streaming" | "complete";
 }) {
   const stateColors = {

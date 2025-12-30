@@ -25,13 +25,13 @@ function isEmptyItem(item: unknown): boolean {
  *
  * @example
  * ```tsx
- * const { object } = useObject({ schema: weatherSchema });
+ * const { object } = useObject({ schema: articleSchema });
  *
- * <Stream.List items={object?.forecast} fallback={<ForecastSkeleton />}>
- *   {(days) => (
- *     <div className="grid grid-cols-3 gap-4">
- *       {days.map((day) => (
- *         <ForecastDay key={day.date} {...day} />
+ * <Stream.List items={object?.sections} fallback={<SectionsSkeleton />}>
+ *   {(sections) => (
+ *     <div className="space-y-4">
+ *       {sections.map((section) => (
+ *         <Section key={section.heading} {...section} />
  *       ))}
  *     </div>
  *   )}

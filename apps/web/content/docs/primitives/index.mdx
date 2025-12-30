@@ -116,33 +116,33 @@ import { Stream } from "@stream.ui/react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 
 // Your schema defines the type
-const weatherSchema = z.object({
-  location: z.string(),
-  temperature: z.number(),
-  forecast: z.array(z.object({ day: z.string(), high: z.number(), low: z.number() })),
+const articleSchema = z.object({
+  title: z.string(),
+  summary: z.string(),
+  sections: z.array(z.object({ heading: z.string(), content: z.string() })),
 });
 
-function WeatherCard() {
+function ArticleCard() {
   const { object, isLoading, error } = useObject({
-    api: "/api/weather",
-    schema: weatherSchema,
+    api: "/api/article",
+    schema: articleSchema,
   });
 
   return (
     <Stream.Root data={object} isLoading={isLoading} error={error}>
-      {/* object?.location is typed as string | undefined */}
+      {/* object?.title is typed as string | undefined */}
       <Stream.Field fallback={<Skeleton />}>
-        <h1>{object?.location}</h1>
+        <h1>{object?.title}</h1>
       </Stream.Field>
       
-      {/* object?.temperature is typed as number | undefined */}
+      {/* object?.summary is typed as string | undefined */}
       <Stream.Field fallback={<Skeleton />}>
-        <span>{object?.temperature}°</span>
+        <p>{object?.summary}</p>
       </Stream.Field>
 
-      {/* object?.forecast is typed as the array from schema */}
-      <Stream.List items={object?.forecast} fallback={<Skeleton />}>
-        {(days) => days.map(day => <Day key={day.day} {...day} />)}
+      {/* object?.sections is typed as the array from schema */}
+      <Stream.List items={object?.sections} fallback={<Skeleton />}>
+        {(sections) => sections.map(section => <Section key={section.heading} {...section} />)}
       </Stream.List>
     </Stream.Root>
   );

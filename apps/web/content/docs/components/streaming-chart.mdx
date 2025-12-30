@@ -1,0 +1,209 @@
+---
+title: Streaming Chart
+description: An animated bar chart component that streams data from AI with smooth reveal animations.
+---
+
+A bar chart component that progressively reveals data as it streams from AI, with interactive hover states and animated value displays.
+
+## Demo
+
+<DemoPreview>
+  <StreamingChartDemo />
+</DemoPreview>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]}>
+  <Tab value="CLI">
+
+```bash
+npx shadcn@latest add https://stream.ui/r/streaming-chart.json
+```
+
+  </Tab>
+  <Tab value="Manual">
+
+<Steps>
+  <Step>
+    ### Install dependencies
+
+```bash
+npm install @stream.ui/react @ai-sdk/react ai zod recharts lucide-react motion
+```
+
+  </Step>
+  <Step>
+    ### Add the chart component from shadcn/ui
+
+```bash
+npx shadcn@latest add chart
+```
+
+  </Step>
+  <Step>
+    ### Copy the schema
+
+```tsx title="streaming-chart-schema.ts"
+import { z } from "zod";
+
+export const streamingChartSchema = z.object({
+  title: z.string().describe("Chart title (e.g., 'Revenue', 'Users')"),
+  value: z.number().describe("Current highlighted value"),
+  unit: z.string().describe("Value unit (e.g., '$', '€', 'users')"),
+  change: z.number().describe("Percentage change vs previous period"),
+  changeLabel: z.string().describe("Label for change (e.g., 'vs. last quarter')"),
+  data: z
+    .array(
+      z.object({
+        label: z.string().describe("X-axis label (e.g., 'Jan', 'Feb')"),
+        value: z.number().describe("Bar value"),
+      }),
+    )
+    .describe("Chart data points"),
+});
+
+export type StreamingChartData = z.infer<typeof streamingChartSchema>;
+```
+
+  </Step>
+  <Step>
+    ### Copy the component
+
+Copy the StreamingChart component from the source.
+
+  </Step>
+  <Step>
+    ### Create the API route
+
+```tsx title="app/api/stream/chart/route.ts"
+import { gateway, Output, streamText } from "ai";
+import { streamingChartSchema } from "@/components/streaming-chart-schema";
+
+export async function POST(request: Request) {
+  const { prompt } = await request.json();
+
+  const result = streamText({
+    model: gateway("openai/gpt-4.1-mini"),
+    output: Output.object({ schema: streamingChartSchema }),
+    system: `You are a data visualization generator. Generate realistic chart data based on the user's request.
+Always include:
+- title: A short descriptive title for the chart
+- value: The current/highlighted value
+- unit: The unit prefix (e.g., "$", "€", "" for counts)
+- change: Percentage change vs previous period
+- changeLabel: Context for the change
+- data: An array of 8-12 data points with label and value`,
+    prompt: `Generate chart data for: ${prompt}`,
+  });
+
+  return result.toTextStreamResponse();
+}
+```
+
+  </Step>
+</Steps>
+
+  </Tab>
+</Tabs>
+
+## Usage
+
+```tsx
+"use client";
+
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { StreamingChart, streamingChartSchema } from "@/components/streaming-chart";
+
+export function MyChartWidget() {
+  const { object, submit, isLoading, error } = useObject({
+    api: "/api/stream/chart",
+    schema: streamingChartSchema,
+  });
+
+  return (
+    <div>
+      <StreamingChart
+        data={object ?? undefined}
+        isLoading={isLoading}
+        error={error ?? undefined}
+      />
+      <button onClick={() => submit({ prompt: "Monthly revenue for 2024" })}>
+        Generate Revenue Chart
+      </button>
+    </div>
+  );
+}
+```
+
+## Features
+
+- **Animated Bars**: Bars animate from collapsed lines to full width on hover
+- **Value Display**: Hovered bar shows its value with a smooth blur-in animation
+- **Trend Indicator**: Badge shows positive/negative change with appropriate colors
+- **Progressive Loading**: Skeleton placeholders while data streams
+- **State Indicators**: Border color changes based on streaming state
+- **Monospace Numbers**: Tabular figures for proper number alignment
+
+## Anatomy
+
+The component uses Stream UI primitives for progressive rendering:
+
+```tsx
+<Stream.Root data={data} isLoading={isLoading} error={error}>
+  <Card>
+    <CardHeader>
+      {/* Main value with animated updates */}
+      <Stream.Field fallback={<HeaderSkeleton />}>
+        {displayValue !== undefined && (
+          <motion.span>{unit}{displayValue.toLocaleString()}</motion.span>
+        )}
+      </Stream.Field>
+
+      {/* Trend badge - only shows when change data exists */}
+      <Stream.When hasData={change !== undefined}>
+        <Badge>{change}%</Badge>
+      </Stream.When>
+    </CardHeader>
+
+    <CardContent>
+      {/* Chart with custom animated bars */}
+      <Stream.List items={chartData} fallback={<ChartSkeleton />}>
+        {(items) => (
+          <BarChart data={items}>
+            <Bar dataKey="value" shape={CustomBar} />
+          </BarChart>
+        )}
+      </Stream.List>
+    </CardContent>
+  </Card>
+</Stream.Root>
+```
+
+## API Reference
+
+### StreamingChart Props
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `data` | `DeepPartial<StreamingChartData> \| undefined` | — |
+| `isLoading` | `boolean` | — |
+| `error` | `Error \| undefined` | — |
+
+### StreamingChartData Schema
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `title` | `string` | Chart title |
+| `value` | `number` | Current highlighted value |
+| `unit` | `string` | Value unit prefix (e.g., "$") |
+| `change` | `number` | Percentage change |
+| `changeLabel` | `string` | Change context label |
+| `data` | `DataPoint[]` | Array of chart data points |
+
+### DataPoint
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `label` | `string` | X-axis label |
+| `value` | `number` | Bar value |
+

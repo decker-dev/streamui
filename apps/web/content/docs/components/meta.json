@@ -1,5 +1,5 @@
 {
   "title": "Components",
-  "pages": ["weather-card", "streaming-text"]
+  "pages": ["streaming-text", "streaming-chart"]
 }
 

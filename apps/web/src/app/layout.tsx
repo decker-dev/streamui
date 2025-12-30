@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: "%s | streamui",
   },
   description:
-    "Beautiful streaming UI components for AI applications. Build progressive, real-time interfaces with React and AI SDK. Weather cards, data visualizations, and more.",
+    "Beautiful streaming UI components for AI applications. Build progressive, real-time interfaces with React and AI SDK. Streaming text, data visualizations, and more.",
   keywords: [
     "streaming UI",
     "React",

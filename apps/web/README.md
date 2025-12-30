@@ -17,7 +17,7 @@ Visit [streamui.dev](https://streamui.dev) to view the documentation.
 ## Quick Start
 
 ```bash
-npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
+npx shadcn@latest add "https://streamui.dev/r/streaming-text.json"
 ```
 
 ## Contributing

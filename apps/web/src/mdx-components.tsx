@@ -11,7 +11,12 @@ import {
   StreamWhenDemo,
   StreamRootDemo,
 } from "@/components/demos";
-import { WeatherCard, WeatherCardDemo, StreamingText, StreamingTextDemo } from "@/registry/stream";
+import {
+  StreamingText,
+  StreamingTextDemo,
+  StreamingChart,
+  StreamingChartDemo,
+} from "@/registry/stream";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -27,10 +32,10 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     StreamListDemo,
     StreamWhenDemo,
     StreamRootDemo,
-    WeatherCard,
-    WeatherCardDemo,
     StreamingText,
     StreamingTextDemo,
+    StreamingChart,
+    StreamingChartDemo,
     ...components,
   };
 }

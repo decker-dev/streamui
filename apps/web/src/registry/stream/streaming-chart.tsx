@@ -1,0 +1,304 @@
+"use client";
+
+import { Stream } from "@stream.ui/react";
+import type { DeepPartial } from "@stream.ui/react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
+import * as React from "react";
+import { Bar, BarChart, XAxis } from "recharts";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { StreamingChartData } from "./streaming-chart-schema";
+
+const chartConfig = {
+  value: {
+    label: "Value",
+    color: "var(--color-foreground)",
+  },
+} satisfies ChartConfig;
+
+function DottedBackgroundPattern() {
+  return (
+    <pattern
+      id="streaming-chart-dots"
+      x="0"
+      y="0"
+      width="10"
+      height="10"
+      patternUnits="userSpaceOnUse"
+    >
+      <circle
+        className="text-muted dark:text-muted/40"
+        cx="2"
+        cy="2"
+        r="1"
+        fill="currentColor"
+      />
+    </pattern>
+  );
+}
+
+function HeaderSkeleton() {
+  return (
+    <div className="flex items-center gap-3">
+      <Skeleton className="h-7 w-24" />
+      <Skeleton className="h-6 w-16 rounded-full" />
+    </div>
+  );
+}
+
+// Custom bar shape that renders skeleton for placeholder items
+function CustomBarShape(props: unknown) {
+  const { x, y, width, height, payload, background } = props as {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    payload: { isPlaceholder?: boolean };
+    background: { height: number };
+  };
+
+  if (payload?.isPlaceholder) {
+    // Skeleton bar aligned to bottom, same height as a medium bar
+    const skeletonHeight = background?.height ? background.height * 0.5 : 80;
+    const skeletonY = y + height - skeletonHeight;
+    return (
+      <g>
+        <rect
+          x={x}
+          y={skeletonY}
+          width={width}
+          height={skeletonHeight}
+          className="animate-pulse fill-muted"
+          rx={4}
+          ry={4}
+        />
+      </g>
+    );
+  }
+
+  // Normal bar
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill="var(--color-foreground)"
+      rx={4}
+      ry={4}
+    />
+  );
+}
+
+interface StreamingChartProps {
+  data: DeepPartial<StreamingChartData> | undefined;
+  isLoading: boolean;
+  error?: Error;
+}
+
+export function StreamingChart({ data, isLoading, error }: StreamingChartProps) {
+  const isStreaming = isLoading && data !== undefined;
+  const isComplete = !isLoading && data !== undefined;
+  const currentState = isComplete
+    ? "complete"
+    : isStreaming
+      ? "streaming"
+      : isLoading
+        ? "loading"
+        : "idle";
+
+  const borderColors = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+  };
+
+  // Get valid chart data items (filter out incomplete ones)
+  const rawChartData = data?.data as Array<{ label?: string; value?: number }> | undefined;
+  const validChartData = React.useMemo(() => {
+    if (!rawChartData) return [];
+    return rawChartData.filter(
+      (item): item is { label: string; value: number } =>
+        item !== null &&
+        item !== undefined &&
+        typeof item.label === "string" &&
+        item.label !== "" &&
+        typeof item.value === "number"
+    );
+  }, [rawChartData]);
+
+  // Calculate average height for skeleton placeholder
+  const avgValue = React.useMemo(() => {
+    if (validChartData.length === 0) return 50000;
+    const sum = validChartData.reduce((acc, item) => acc + item.value, 0);
+    return sum / validChartData.length;
+  }, [validChartData]);
+
+  // Add a placeholder bar when streaming to show "next bar loading"
+  const chartDataWithPlaceholder = React.useMemo(() => {
+    if (!isLoading || validChartData.length === 0) return validChartData;
+    return [...validChartData, { label: "", value: avgValue, isPlaceholder: true }];
+  }, [validChartData, isLoading, avgValue]);
+
+  const change = data?.change as number | undefined;
+  const isPositive = change !== undefined && change >= 0;
+  const displayValue = data?.value;
+  const unit = data?.unit ?? "";
+
+  const hasData = validChartData.length > 0;
+
+  return (
+    <Stream.Root data={data} isLoading={isLoading} error={error}>
+      <Card className={cn("w-full max-w-md transition-colors", borderColors[currentState])}>
+        <CardHeader>
+          <CardTitle>
+            <div className="flex items-center gap-2">
+              <Stream.Field fallback={<HeaderSkeleton />}>
+                {displayValue !== undefined && (
+                  <motion.span
+                    key={displayValue}
+                    initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    className="font-mono text-xl font-bold tabular-nums tracking-tight"
+                  >
+                    {unit}
+                    {displayValue.toLocaleString()}
+                  </motion.span>
+                )}
+              </Stream.Field>
+              {change !== undefined && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", bounce: 0.3 }}
+                >
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "gap-1 border-none",
+                      isPositive
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-red-500/10 text-red-600 dark:text-red-400",
+                    )}
+                  >
+                    {isPositive ? (
+                      <TrendingUp className="h-3.5 w-3.5" />
+                    ) : (
+                      <TrendingDown className="h-3.5 w-3.5" />
+                    )}
+                    <span className="font-mono text-xs tabular-nums">
+                      {isPositive && "+"}
+                      {change.toFixed(1)}%
+                    </span>
+                  </Badge>
+                </motion.div>
+              )}
+            </div>
+          </CardTitle>
+          <CardDescription className="min-h-5">
+            <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
+              {data?.changeLabel}
+            </Stream.Field>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!hasData && isLoading ? (
+            // Initial loading - show single skeleton bar with label
+            <div className="relative h-[200px] w-full">
+              {/* Dotted background */}
+              <div 
+                className="absolute inset-0 bottom-[32px]"
+                style={{
+                  backgroundImage: `radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px)`,
+                  backgroundSize: '10px 10px',
+                }}
+              />
+              {/* Skeleton bar aligned to bottom */}
+              <div className="absolute bottom-[32px] left-4 flex flex-col items-center">
+                <Skeleton className="h-20 w-10 rounded" />
+              </div>
+              {/* Skeleton label */}
+              <div className="absolute bottom-2 left-4 flex w-10 justify-center">
+                <Skeleton className="h-3 w-8" />
+              </div>
+            </div>
+          ) : hasData ? (
+            <ChartContainer config={chartConfig} className="h-[200px] w-full">
+              <BarChart accessibilityLayer data={chartDataWithPlaceholder}>
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="85%"
+                  fill="url(#streaming-chart-dots)"
+                />
+                <defs>
+                  <DottedBackgroundPattern />
+                </defs>
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tick={(tickProps) => {
+                    const { x, y, payload } = tickProps;
+                    // Show skeleton for placeholder label
+                    if (payload?.value === "") {
+                      return (
+                        <foreignObject x={x - 12} y={y} width={24} height={16}>
+                          <div className="h-3 w-6 animate-pulse rounded bg-muted" />
+                        </foreignObject>
+                      );
+                    }
+                    return (
+                      <text
+                        x={x}
+                        y={y}
+                        dy={4}
+                        textAnchor="middle"
+                        fontSize={11}
+                        fill="var(--color-muted-foreground)"
+                      >
+                        {payload?.value}
+                      </text>
+                    );
+                  }}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={4}
+                  shape={<CustomBarShape />}
+                  isAnimationActive={false}
+                />
+              </BarChart>
+            </ChartContainer>
+          ) : (
+            <div className="flex h-[200px] items-center justify-center text-muted-foreground text-sm">
+              Click a button to generate chart data
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Stream.Root>
+  );
+}

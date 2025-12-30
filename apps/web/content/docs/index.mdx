@@ -43,9 +43,9 @@ import { Stream } from "@stream.ui/react";
 And **components** that use these primitives with beautiful styling:
 
 ```tsx
-import { WeatherCard } from "@/components/stream/weather-card";
+import { StreamingText } from "@/components/stream/streaming-text";
 
-<WeatherCard data={object} isLoading={isLoading} />
+<StreamingText data={object} isLoading={isLoading} />
 ```
 
 ## Two Parts
@@ -70,7 +70,7 @@ npm install @stream.ui/react
 Like shadcn/ui, components are **not** installed via npm. Copy them into your codebase and customize.
 
 ```bash
-npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
+npx shadcn@latest add "https://streamui.dev/r/streaming-text.json"
 ```
 
 Components use the primitives internally and work with shadcn/ui out of the box.
@@ -86,23 +86,23 @@ npm install @stream.ui/react
 ### 2. Add a component
 
 ```bash
-npx shadcn@latest add "https://streamui.dev/r/weather-card.json"
+npx shadcn@latest add "https://streamui.dev/r/streaming-text.json"
 ```
 
 ### 3. Use with AI SDK
 
 ```tsx
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { WeatherCard, weatherCardSchema } from "@/components/stream/weather-card";
+import { StreamingText, streamingTextSchema } from "@/components/stream/streaming-text";
 
-export function WeatherDemo() {
+export function TextDemo() {
   const { object, submit, isLoading } = useObject({
-    api: "/api/weather",
-    schema: weatherCardSchema,
+    api: "/api/text",
+    schema: streamingTextSchema,
   });
 
   return (
-    <WeatherCard 
+    <StreamingText 
       data={object ?? undefined} 
       isLoading={isLoading && !object} 
     />

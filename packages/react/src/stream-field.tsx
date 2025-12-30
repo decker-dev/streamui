@@ -36,19 +36,19 @@ function containsUndefined(node: ReactNode): boolean {
  *
  * @example
  * ```tsx
- * const { object } = useObject({ schema: weatherSchema });
+ * const { object } = useObject({ schema: articleSchema });
  *
  * <Stream.Field fallback={<Skeleton className="h-8 w-32" />}>
- *   <h1>{object?.location}</h1>
+ *   <h1>{object?.title}</h1>
  * </Stream.Field>
  *
  * <Stream.Field fallback={<Skeleton className="h-12 w-20" />}>
- *   <span className="text-4xl">{object?.temperature}°C</span>
+ *   <p className="text-lg">{object?.summary}</p>
  * </Stream.Field>
  *
  * // Also works with just the value
  * <Stream.Field fallback={<Skeleton />}>
- *   {object?.humidity}%
+ *   {object?.author}
  * </Stream.Field>
  * ```
  */

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   code?: string;
-  /** Component name for generating v0 demo URL (e.g., "weather-card") */
+  /** Component name for generating v0 demo URL (e.g., "streaming-text") */
   component?: string;
   /** Example identifier for the demo URL (e.g., "preview", "basic", "elevated") */
   example?: string;

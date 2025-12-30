@@ -10,24 +10,24 @@ import { StreamWhen } from "./stream-when";
  * ```tsx
  * import { Stream } from "@stream.ui/react";
  *
- * function WeatherCard() {
+ * function ArticleCard() {
  *   const { object, isLoading, error } = useObject({
- *     api: "/api/weather",
- *     schema: weatherSchema,
+ *     api: "/api/article",
+ *     schema: articleSchema,
  *   });
  *
  *   return (
  *     <Stream.Root data={object} isLoading={isLoading} error={error}>
  *       <Stream.Field fallback={<Skeleton className="h-8 w-32" />}>
- *         <h1>{object?.location}</h1>
+ *         <h1>{object?.title}</h1>
  *       </Stream.Field>
  *
  *       <Stream.Field fallback={<Skeleton className="h-12 w-20" />}>
- *         <span className="text-4xl">{object?.temperature}°C</span>
+ *         <p className="text-lg">{object?.summary}</p>
  *       </Stream.Field>
  *
- *       <Stream.List items={object?.forecast} fallback={<ForecastSkeleton />}>
- *         {(days) => days.map((day) => <ForecastDay key={day.date} {...day} />)}
+ *       <Stream.List items={object?.sections} fallback={<SectionsSkeleton />}>
+ *         {(sections) => sections.map((s) => <Section key={s.heading} {...s} />)}
  *       </Stream.List>
  *
  *       <Stream.When streaming>
