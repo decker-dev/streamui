@@ -83,18 +83,28 @@ export function StreamingTextDemo() {
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 interface StreamingTextProps {
+  /** The text content to display */
   children: string;
+  /** Whether the text is currently streaming */
   streaming?: boolean;
+  /** Cursor character to show while streaming */
   cursor?: string;
+  /** Enable smooth character-by-character rendering */
   smooth?: boolean;
+  /** Characters per tick when smooth is enabled (default: 2) */
   speed?: number;
+  /** Additional class name for the container */
   className?: string;
+  /** Additional class name for the cursor */
   cursorClassName?: string;
 }
 
+/**
+ * Hook that smoothly reveals text character by character
+ */
 function useSmoothText(
   text: string,
   enabled: boolean,
@@ -137,6 +147,7 @@ function useSmoothText(
     };
   }, [text, enabled, charsPerTick, tickMs, displayedLength]);
 
+  // Reset when text changes significantly (new response)
   React.useEffect(() => {
     if (text.length < displayedLength) {
       setDisplayedLength(0);
@@ -146,6 +157,21 @@ function useSmoothText(
   return enabled ? text.slice(0, displayedLength) : text;
 }
 
+/**
+ * StreamingText - Display text with an animated cursor while streaming.
+ *
+ * A simple component that shows a blinking cursor at the end of text
+ * while content is being streamed from an AI model.
+ *
+ * @example
+ * ```tsx
+ * const { object, isLoading } = useObject({ ... });
+ *
+ * <StreamingText streaming={isLoading} smooth>
+ *   {object?.text ?? ""}
+ * </StreamingText>
+ * ```
+ */
 export function StreamingText({
   children,
   streaming = false,
