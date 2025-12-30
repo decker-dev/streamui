@@ -52,37 +52,25 @@ function DottedBackgroundPattern() {
   );
 }
 
-function HeaderSkeleton() {
-  return (
-    <div className="flex items-center gap-3">
-      <Skeleton className="h-7 w-24" />
-      <Skeleton className="h-6 w-16 rounded-full" />
-    </div>
-  );
-}
-
 // Custom bar shape that renders skeleton for placeholder items
 function CustomBarShape(props: unknown) {
-  const { x, y, width, height, payload, background } = props as {
+  const { x, y, width, height, payload } = props as {
     x: number;
     y: number;
     width: number;
     height: number;
     payload: { isPlaceholder?: boolean };
-    background: { height: number };
   };
 
   if (payload?.isPlaceholder) {
-    // Skeleton bar aligned to bottom, same height as a medium bar
-    const skeletonHeight = background?.height ? background.height * 0.5 : 80;
-    const skeletonY = y + height - skeletonHeight;
+    // Skeleton bar uses the height calculated from lastValue
     return (
       <g>
         <rect
           x={x}
-          y={skeletonY}
+          y={y}
           width={width}
-          height={skeletonHeight}
+          height={height}
           className="animate-pulse fill-muted"
           rx={4}
           ry={4}
@@ -149,11 +137,10 @@ export function StreamingChart({
     );
   }, [rawChartData]);
 
-  // Calculate average height for skeleton placeholder
-  const avgValue = React.useMemo(() => {
+  // Get last value for skeleton placeholder height
+  const lastValue = React.useMemo(() => {
     if (validChartData.length === 0) return 50000;
-    const sum = validChartData.reduce((acc, item) => acc + item.value, 0);
-    return sum / validChartData.length;
+    return validChartData[validChartData.length - 1].value;
   }, [validChartData]);
 
   // Add a placeholder bar when loading to show "next bar loading"
@@ -166,9 +153,9 @@ export function StreamingChart({
     }
     return [
       ...validChartData,
-      { label: "", value: avgValue, isPlaceholder: true },
+      { label: "", value: lastValue, isPlaceholder: true },
     ];
-  }, [validChartData, isLoading, avgValue]);
+  }, [validChartData, isLoading, lastValue]);
 
   const change = data?.change as number | undefined;
   const isPositive = change !== undefined && change >= 0;
@@ -188,22 +175,22 @@ export function StreamingChart({
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle>
-              <Stream.Field fallback={<HeaderSkeleton />}>
-                {displayValue !== undefined && (
-                  <motion.span
-                    key={displayValue}
-                    initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    className="font-mono text-xl font-bold tabular-nums tracking-tight"
-                  >
-                    {unit}
-                    {displayValue.toLocaleString()}
-                  </motion.span>
-                )}
-              </Stream.Field>
+              {displayValue !== undefined ? (
+                <motion.span
+                  key={displayValue}
+                  initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  className="font-mono text-xl font-bold tabular-nums tracking-tight"
+                >
+                  {unit}
+                  {displayValue.toLocaleString()}
+                </motion.span>
+              ) : isLoading ? (
+                <Skeleton className="h-7 w-28" />
+              ) : null}
             </CardTitle>
             <div className="flex flex-col items-end gap-1">
-              {change !== undefined && (
+              {change !== undefined ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -229,11 +216,12 @@ export function StreamingChart({
                     </span>
                   </Badge>
                 </motion.div>
-              )}
+              ) : isLoading ? (
+                <Skeleton className="h-5 w-16 rounded-full" />
+              ) : null}
               <CardDescription className="min-h-5">
-                <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
-                  {data?.changeLabel}
-                </Stream.Field>
+                {data?.changeLabel ??
+                  (isLoading ? <Skeleton className="h-4 w-28" /> : null)}
               </CardDescription>
             </div>
           </div>
