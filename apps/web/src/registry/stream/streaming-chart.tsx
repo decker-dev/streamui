@@ -175,53 +175,56 @@ export function StreamingChart({
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle>
-              {displayValue !== undefined ? (
-                <motion.span
-                  key={displayValue}
-                  initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  className="font-mono text-xl font-bold tabular-nums tracking-tight"
-                >
-                  {unit}
-                  {displayValue.toLocaleString()}
-                </motion.span>
-              ) : isLoading ? (
-                <Skeleton className="h-7 w-28" />
-              ) : null}
+              <Stream.Field fallback={<Skeleton className="h-7 w-28" />}>
+                {displayValue !== undefined ? (
+                  <motion.span
+                    key={displayValue}
+                    initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    className="font-mono text-xl font-bold tabular-nums tracking-tight"
+                  >
+                    {unit}
+                    {displayValue.toLocaleString()}
+                  </motion.span>
+                ) : undefined}
+              </Stream.Field>
             </CardTitle>
             <div className="flex flex-col items-end gap-1">
-              {change !== undefined ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: "spring", bounce: 0.3 }}
-                >
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "gap-1 border-none",
-                      isPositive
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                        : "bg-red-500/10 text-red-600 dark:text-red-400",
-                    )}
+              <Stream.Field
+                fallback={<Skeleton className="h-5 w-16 rounded-full" />}
+              >
+                {change !== undefined ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", bounce: 0.3 }}
                   >
-                    {isPositive ? (
-                      <TrendingUp className="h-3.5 w-3.5" />
-                    ) : (
-                      <TrendingDown className="h-3.5 w-3.5" />
-                    )}
-                    <span className="font-mono text-xs tabular-nums">
-                      {isPositive && "+"}
-                      {change.toFixed(1)}%
-                    </span>
-                  </Badge>
-                </motion.div>
-              ) : isLoading ? (
-                <Skeleton className="h-5 w-16 rounded-full" />
-              ) : null}
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "gap-1 border-none",
+                        isPositive
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "bg-red-500/10 text-red-600 dark:text-red-400",
+                      )}
+                    >
+                      {isPositive ? (
+                        <TrendingUp className="h-3.5 w-3.5" />
+                      ) : (
+                        <TrendingDown className="h-3.5 w-3.5" />
+                      )}
+                      <span className="font-mono text-xs tabular-nums">
+                        {isPositive && "+"}
+                        {change.toFixed(1)}%
+                      </span>
+                    </Badge>
+                  </motion.div>
+                ) : undefined}
+              </Stream.Field>
               <CardDescription className="min-h-5">
-                {data?.changeLabel ??
-                  (isLoading ? <Skeleton className="h-4 w-28" /> : null)}
+                <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
+                  {data?.changeLabel}
+                </Stream.Field>
               </CardDescription>
             </div>
           </div>

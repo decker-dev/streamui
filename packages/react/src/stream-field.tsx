@@ -1,4 +1,5 @@
-import { isValidElement, type ReactNode } from "react";
+import { isValidElement, type ReactNode, useContext } from "react";
+import { StreamContext } from "./context";
 import type { StreamFieldProps } from "./types";
 
 /**
@@ -31,7 +32,8 @@ function containsUndefined(node: ReactNode): boolean {
  * Stream.Field - Renders children or fallback based on undefined detection.
  *
  * Inspects the children tree for undefined values. If any undefined is found
- * (indicating a streamed field hasn't arrived), shows the fallback.
+ * AND we're in a loading state, shows the fallback.
+ * In idle state (not loading), returns null when children is undefined.
  * Otherwise renders the children as-is.
  *
  * @example
@@ -56,8 +58,14 @@ export function StreamField({
   fallback = null,
   children,
 }: StreamFieldProps): ReactNode {
+  const context = useContext(StreamContext);
+
   if (containsUndefined(children)) {
-    return fallback;
+    // Only show fallback when loading, not in idle state
+    if (context?.isLoading) {
+      return fallback;
+    }
+    return null;
   }
 
   return children;
