@@ -3,7 +3,7 @@ title: Streaming Text
 description: Display text with an animated cursor while streaming from AI.
 ---
 
-A simple component that shows a blinking cursor at the end of text while content is being streamed from an AI model.
+A simple component that shows a blinking cursor at the end of text while content is being streamed from an AI model. Supports smooth character-by-character rendering for a typewriter effect.
 
 ## Demo
 
@@ -30,32 +30,88 @@ npx shadcn@latest add https://streamui.dev/r/streaming-text.json
 ```tsx title="streaming-text.tsx"
 "use client";
 
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface StreamingTextProps {
   children: string;
   streaming?: boolean;
   cursor?: string;
+  smooth?: boolean;
+  speed?: number;
   className?: string;
   cursorClassName?: string;
+}
+
+function useSmoothText(
+  text: string,
+  enabled: boolean,
+  charsPerTick = 2,
+  tickMs = 16,
+) {
+  const [displayedLength, setDisplayedLength] = React.useState(0);
+  const targetLengthRef = React.useRef(0);
+  const rafRef = React.useRef<number | null>(null);
+  const lastTickRef = React.useRef(0);
+
+  React.useEffect(() => {
+    targetLengthRef.current = text.length;
+
+    if (!enabled) {
+      setDisplayedLength(text.length);
+      return;
+    }
+
+    const animate = (timestamp: number) => {
+      if (timestamp - lastTickRef.current >= tickMs) {
+        lastTickRef.current = timestamp;
+        setDisplayedLength((prev) => {
+          const next = Math.min(prev + charsPerTick, targetLengthRef.current);
+          return next;
+        });
+      }
+
+      if (displayedLength < targetLengthRef.current) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [text, enabled, charsPerTick, tickMs, displayedLength]);
+
+  React.useEffect(() => {
+    if (text.length < displayedLength) {
+      setDisplayedLength(0);
+    }
+  }, [text, displayedLength]);
+
+  return enabled ? text.slice(0, displayedLength) : text;
 }
 
 export function StreamingText({
   children,
   streaming = false,
   cursor = "▌",
+  smooth = false,
+  speed = 2,
   className,
   cursorClassName,
 }: StreamingTextProps) {
+  const displayedText = useSmoothText(children, smooth, speed);
+  const isAnimating = smooth && displayedText.length < children.length;
+
   return (
     <span className={cn("whitespace-pre-wrap", className)}>
-      {children}
-      {streaming && (
+      {displayedText}
+      {(streaming || isAnimating) && (
         <span
-          className={cn(
-            "ml-0.5 inline-block animate-pulse",
-            cursorClassName
-          )}
+          className={cn("ml-0.5 inline-block animate-pulse", cursorClassName)}
           aria-hidden="true"
         >
           {cursor}
@@ -74,6 +130,28 @@ export function StreamingText({
 
 ## Usage
 
+### With useObject
+
+```tsx
+"use client";
+
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { StreamingText } from "@/components/ui/streaming-text";
+
+export function StreamingResponse() {
+  const { object, isLoading, submit } = useObject({
+    api: "/api/stream/text",
+    schema: yourSchema,
+  });
+
+  return (
+    <StreamingText streaming={isLoading} smooth>
+      {object?.text ?? ""}
+    </StreamingText>
+  );
+}
+```
+
 ### With useCompletion
 
 ```tsx
@@ -88,11 +166,9 @@ export function ChatResponse() {
   });
 
   return (
-    <div className="prose">
-      <StreamingText streaming={isLoading}>
-        {completion}
-      </StreamingText>
-    </div>
+    <StreamingText streaming={isLoading}>
+      {completion}
+    </StreamingText>
   );
 }
 ```
@@ -117,6 +193,26 @@ export function ChatMessage({ message, isStreaming }) {
 ```
 
 ## Examples
+
+### Smooth Typewriter Effect
+
+Enable smooth character-by-character rendering for a typewriter effect:
+
+```tsx
+<StreamingText streaming={isLoading} smooth>
+  {text}
+</StreamingText>
+```
+
+### Custom Speed
+
+Control how many characters appear per animation frame:
+
+```tsx
+<StreamingText streaming={isLoading} smooth speed={4}>
+  {text}
+</StreamingText>
+```
 
 ### Custom Cursor
 
@@ -165,13 +261,12 @@ Add custom blink animation in your CSS:
 
 ## API Reference
 
-### Props
-
 | Prop | Type | Default |
 | --- | --- | --- |
 | `children` | `string` | — |
 | `streaming` | `boolean` | `false` |
 | `cursor` | `string` | `"▌"` |
+| `smooth` | `boolean` | `false` |
+| `speed` | `number` | `2` |
 | `className` | `string` | — |
 | `cursorClassName` | `string` | — |
-
