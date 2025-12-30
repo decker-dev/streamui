@@ -13,30 +13,20 @@ A bar chart component that progressively reveals data as it streams from AI, wit
 
 ## Installation
 
-<Tabs items={["CLI", "Manual"]}>
-  <Tab value="CLI">
-
-```bash
-npx shadcn@latest add https://stream.ui/r/streaming-chart.json
-```
-
-  </Tab>
-  <Tab value="Manual">
-
 <Steps>
   <Step>
     ### Install dependencies
 
 ```bash
-npm install @stream.ui/react @ai-sdk/react ai zod recharts lucide-react motion
+npm install @stream.ui/react recharts lucide-react motion
 ```
 
   </Step>
   <Step>
-    ### Add the chart component from shadcn/ui
+    ### Add shadcn/ui components
 
 ```bash
-npx shadcn@latest add chart
+npx shadcn@latest add badge card chart skeleton
 ```
 
   </Step>
@@ -69,22 +59,320 @@ export type StreamingChartData = z.infer<typeof streamingChartSchema>;
   <Step>
     ### Copy the component
 
-Copy the StreamingChart component from the source.
+```tsx title="streaming-chart.tsx"
+"use client";
+
+import type { DeepPartial } from "@stream.ui/react";
+import { Stream } from "@stream.ui/react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
+import * as React from "react";
+import { Bar, BarChart, XAxis } from "recharts";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { StreamingChartData } from "./streaming-chart-schema";
+
+const chartConfig = {
+  value: {
+    label: "Value",
+    color: "var(--color-foreground)",
+  },
+} satisfies ChartConfig;
+
+function DottedBackgroundPattern() {
+  return (
+    <pattern
+      id="streaming-chart-dots"
+      x="0"
+      y="0"
+      width="10"
+      height="10"
+      patternUnits="userSpaceOnUse"
+    >
+      <circle
+        className="text-muted dark:text-muted/40"
+        cx="2"
+        cy="2"
+        r="1"
+        fill="currentColor"
+      />
+    </pattern>
+  );
+}
+
+function HeaderSkeleton() {
+  return (
+    <div className="flex items-center gap-3">
+      <Skeleton className="h-7 w-24" />
+      <Skeleton className="h-6 w-16 rounded-full" />
+    </div>
+  );
+}
+
+function CustomBarShape(props: unknown) {
+  const { x, y, width, height, payload, background } = props as {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    payload: { isPlaceholder?: boolean };
+    background: { height: number };
+  };
+
+  if (payload?.isPlaceholder) {
+    const skeletonHeight = background?.height ? background.height * 0.5 : 80;
+    const skeletonY = y + height - skeletonHeight;
+    return (
+      <g>
+        <rect
+          x={x}
+          y={skeletonY}
+          width={width}
+          height={skeletonHeight}
+          className="animate-pulse fill-muted"
+          rx={4}
+          ry={4}
+        />
+      </g>
+    );
+  }
+
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill="var(--color-foreground)"
+      rx={4}
+      ry={4}
+    />
+  );
+}
+
+interface StreamingChartProps {
+  data: DeepPartial<StreamingChartData> | undefined;
+  isLoading: boolean;
+  error?: Error;
+}
+
+export function StreamingChart({
+  data,
+  isLoading,
+  error,
+}: StreamingChartProps) {
+  const isStreaming = isLoading && data !== undefined;
+  const isComplete = !isLoading && data !== undefined;
+  const currentState = isComplete
+    ? "complete"
+    : isStreaming
+      ? "streaming"
+      : isLoading
+        ? "loading"
+        : "idle";
+
+  const borderColors = {
+    idle: "",
+    loading: "border-yellow-500/50",
+    streaming: "border-blue-500/50",
+    complete: "border-green-500/50",
+  };
+
+  const rawChartData = data?.data as
+    | Array<{ label?: string; value?: number }>
+    | undefined;
+  const validChartData = React.useMemo(() => {
+    if (!rawChartData) return [];
+    return rawChartData.filter(
+      (item): item is { label: string; value: number } =>
+        item !== null &&
+        item !== undefined &&
+        typeof item.label === "string" &&
+        item.label !== "" &&
+        typeof item.value === "number",
+    );
+  }, [rawChartData]);
+
+  const avgValue = React.useMemo(() => {
+    if (validChartData.length === 0) return 50000;
+    const sum = validChartData.reduce((acc, item) => acc + item.value, 0);
+    return sum / validChartData.length;
+  }, [validChartData]);
+
+  const chartDataWithPlaceholder = React.useMemo(() => {
+    if (!isLoading) return validChartData;
+    if (validChartData.length === 0) {
+      return [{ label: "", value: 50000, isPlaceholder: true }];
+    }
+    return [
+      ...validChartData,
+      { label: "", value: avgValue, isPlaceholder: true },
+    ];
+  }, [validChartData, isLoading, avgValue]);
+
+  const change = data?.change as number | undefined;
+  const isPositive = change !== undefined && change >= 0;
+  const displayValue = data?.value;
+  const unit = data?.unit ?? "";
+
+  const hasChartData = chartDataWithPlaceholder.length > 0;
+
+  return (
+    <Stream.Root data={data} isLoading={isLoading} error={error}>
+      <Card
+        className={cn(
+          "w-full max-w-md transition-colors",
+          borderColors[currentState],
+        )}
+      >
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <CardTitle>
+              <Stream.Field fallback={<HeaderSkeleton />}>
+                {displayValue !== undefined && (
+                  <motion.span
+                    key={displayValue}
+                    initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    className="font-mono text-xl font-bold tabular-nums tracking-tight"
+                  >
+                    {unit}
+                    {displayValue.toLocaleString()}
+                  </motion.span>
+                )}
+              </Stream.Field>
+            </CardTitle>
+            <div className="flex flex-col items-end gap-1">
+              {change !== undefined && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", bounce: 0.3 }}
+                >
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "gap-1 border-none",
+                      isPositive
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-red-500/10 text-red-600 dark:text-red-400",
+                    )}
+                  >
+                    {isPositive ? (
+                      <TrendingUp className="h-3.5 w-3.5" />
+                    ) : (
+                      <TrendingDown className="h-3.5 w-3.5" />
+                    )}
+                    <span className="font-mono text-xs tabular-nums">
+                      {isPositive && "+"}
+                      {change.toFixed(1)}%
+                    </span>
+                  </Badge>
+                </motion.div>
+              )}
+              <CardDescription className="min-h-5">
+                <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
+                  {data?.changeLabel}
+                </Stream.Field>
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {hasChartData ? (
+            <ChartContainer config={chartConfig} className="h-[200px] w-full">
+              <BarChart accessibilityLayer data={chartDataWithPlaceholder}>
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="85%"
+                  fill="url(#streaming-chart-dots)"
+                />
+                <defs>
+                  <DottedBackgroundPattern />
+                </defs>
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tick={(tickProps) => {
+                    const { x, y, payload } = tickProps;
+                    if (payload?.value === "") {
+                      return (
+                        <foreignObject x={x - 12} y={y} width={24} height={16}>
+                          <div className="h-3 w-6 animate-pulse rounded bg-muted" />
+                        </foreignObject>
+                      );
+                    }
+                    return (
+                      <text
+                        x={x}
+                        y={y}
+                        dy={4}
+                        textAnchor="middle"
+                        fontSize={11}
+                        fill="var(--color-muted-foreground)"
+                      >
+                        {payload?.value}
+                      </text>
+                    );
+                  }}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={4}
+                  shape={<CustomBarShape />}
+                  isAnimationActive={false}
+                />
+              </BarChart>
+            </ChartContainer>
+          ) : (
+            <div className="flex h-[200px] items-center justify-center text-muted-foreground text-sm">
+              Click a button to generate chart data
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Stream.Root>
+  );
+}
+```
 
   </Step>
   <Step>
     ### Create the API route
 
 ```tsx title="app/api/stream/chart/route.ts"
-import { gateway, Output, streamText } from "ai";
-import { streamingChartSchema } from "@/components/streaming-chart-schema";
+import { openai } from "@ai-sdk/openai";
+import { streamObject } from "ai";
+import { streamingChartSchema } from "@/components/ui/streaming-chart-schema";
 
 export async function POST(request: Request) {
   const { prompt } = await request.json();
 
-  const result = streamText({
-    model: gateway("openai/gpt-4.1-mini"),
-    output: Output.object({ schema: streamingChartSchema }),
+  const result = streamObject({
+    model: openai("gpt-4o-mini"),
+    schema: streamingChartSchema,
     system: `You are a data visualization generator. Generate realistic chart data based on the user's request.
 Always include:
 - title: A short descriptive title for the chart
@@ -103,16 +391,14 @@ Always include:
   </Step>
 </Steps>
 
-  </Tab>
-</Tabs>
-
 ## Usage
 
 ```tsx
 "use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { StreamingChart, streamingChartSchema } from "@/components/streaming-chart";
+import { StreamingChart } from "@/components/ui/streaming-chart";
+import { streamingChartSchema } from "@/components/ui/streaming-chart-schema";
 
 export function MyChartWidget() {
   const { object, submit, isLoading, error } = useObject({
@@ -137,47 +423,11 @@ export function MyChartWidget() {
 
 ## Features
 
-- **Animated Bars**: Bars animate from collapsed lines to full width on hover
-- **Value Display**: Hovered bar shows its value with a smooth blur-in animation
-- **Trend Indicator**: Badge shows positive/negative change with appropriate colors
 - **Progressive Loading**: Skeleton placeholders while data streams
-- **State Indicators**: Border color changes based on streaming state
+- **Trend Indicator**: Badge shows positive/negative change with appropriate colors
+- **State Indicators**: Border color changes based on streaming state (loading → streaming → complete)
 - **Monospace Numbers**: Tabular figures for proper number alignment
-
-## Anatomy
-
-The component uses Stream UI primitives for progressive rendering:
-
-```tsx
-<Stream.Root data={data} isLoading={isLoading} error={error}>
-  <Card>
-    <CardHeader>
-      {/* Main value with animated updates */}
-      <Stream.Field fallback={<HeaderSkeleton />}>
-        {displayValue !== undefined && (
-          <motion.span>{unit}{displayValue.toLocaleString()}</motion.span>
-        )}
-      </Stream.Field>
-
-      {/* Trend badge - only shows when change data exists */}
-      <Stream.When hasData={change !== undefined}>
-        <Badge>{change}%</Badge>
-      </Stream.When>
-    </CardHeader>
-
-    <CardContent>
-      {/* Chart with custom animated bars */}
-      <Stream.Field fallback={<ChartSkeleton />}>
-        {chartData && chartData.length > 0 && (
-          <BarChart data={chartData}>
-            <Bar dataKey="value" shape={CustomBar} />
-          </BarChart>
-        )}
-      </Stream.Field>
-    </CardContent>
-  </Card>
-</Stream.Root>
-```
+- **Animated Values**: Smooth blur-in animation when values update
 
 ## API Reference
 
@@ -191,19 +441,11 @@ The component uses Stream UI primitives for progressive rendering:
 
 ### StreamingChartData Schema
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `title` | `string` | Chart title |
-| `value` | `number` | Current highlighted value |
-| `unit` | `string` | Value unit prefix (e.g., "$") |
-| `change` | `number` | Percentage change |
-| `changeLabel` | `string` | Change context label |
-| `data` | `DataPoint[]` | Array of chart data points |
-
-### DataPoint
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `label` | `string` | X-axis label |
-| `value` | `number` | Bar value |
-
+| Field | Type |
+| --- | --- |
+| `title` | `string` |
+| `value` | `number` |
+| `unit` | `string` |
+| `change` | `number` |
+| `changeLabel` | `string` |
+| `data` | `{ label: string; value: number }[]` |
