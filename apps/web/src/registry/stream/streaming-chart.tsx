@@ -150,9 +150,14 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
     return sum / validChartData.length;
   }, [validChartData]);
 
-  // Add a placeholder bar when streaming to show "next bar loading"
+  // Add a placeholder bar when loading to show "next bar loading"
+  // Also shows initial placeholder when no data yet
   const chartDataWithPlaceholder = React.useMemo(() => {
-    if (!isLoading || validChartData.length === 0) return validChartData;
+    if (!isLoading) return validChartData;
+    if (validChartData.length === 0) {
+      // Initial loading state - show single placeholder bar
+      return [{ label: "", value: 50000, isPlaceholder: true }];
+    }
     return [...validChartData, { label: "", value: avgValue, isPlaceholder: true }];
   }, [validChartData, isLoading, avgValue]);
 
@@ -161,7 +166,7 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
   const displayValue = data?.value;
   const unit = data?.unit ?? "";
 
-  const hasData = validChartData.length > 0;
+  const hasChartData = chartDataWithPlaceholder.length > 0;
 
   return (
     <Stream.Root data={data} isLoading={isLoading} error={error}>
@@ -218,27 +223,7 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!hasData && isLoading ? (
-            // Initial loading - show single skeleton bar with label
-            <div className="relative h-[200px] w-full">
-              {/* Dotted background */}
-              <div 
-                className="absolute inset-0 bottom-[32px]"
-                style={{
-                  backgroundImage: `radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px)`,
-                  backgroundSize: '10px 10px',
-                }}
-              />
-              {/* Skeleton bar aligned to bottom */}
-              <div className="absolute bottom-[32px] left-4 flex flex-col items-center">
-                <Skeleton className="h-20 w-10 rounded" />
-              </div>
-              {/* Skeleton label */}
-              <div className="absolute bottom-2 left-4 flex w-10 justify-center">
-                <Skeleton className="h-3 w-8" />
-              </div>
-            </div>
-          ) : hasData ? (
+          {hasChartData ? (
             <ChartContainer config={chartConfig} className="h-[200px] w-full">
               <BarChart accessibilityLayer data={chartDataWithPlaceholder}>
                 <rect
