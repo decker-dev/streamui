@@ -172,8 +172,8 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
     <Stream.Root data={data} isLoading={isLoading} error={error}>
       <Card className={cn("w-full max-w-md transition-colors", borderColors[currentState])}>
         <CardHeader>
-          <CardTitle>
-            <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between">
+            <CardTitle>
               <Stream.Field fallback={<HeaderSkeleton />}>
                 {displayValue !== undefined && (
                   <motion.span
@@ -187,6 +187,8 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
                   </motion.span>
                 )}
               </Stream.Field>
+            </CardTitle>
+            <div className="flex flex-col items-end gap-1">
               {change !== undefined && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -214,13 +216,13 @@ export function StreamingChart({ data, isLoading, error }: StreamingChartProps) 
                   </Badge>
                 </motion.div>
               )}
+              <CardDescription className="min-h-5">
+                <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
+                  {data?.changeLabel}
+                </Stream.Field>
+              </CardDescription>
             </div>
-          </CardTitle>
-          <CardDescription className="min-h-5">
-            <Stream.Field fallback={<Skeleton className="h-4 w-28" />}>
-              {data?.changeLabel}
-            </Stream.Field>
-          </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           {hasChartData ? (
