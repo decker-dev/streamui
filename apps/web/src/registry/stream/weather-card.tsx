@@ -118,7 +118,7 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
           <div className="mb-4 min-h-16">
             <div className="text-6xl font-bold tabular-nums tracking-tighter">
               <Stream.Field fallback={<Skeleton className="h-16 w-28" />}>
-                {data?.temperature !== undefined && `${data.temperature}°`}
+                <span>{data?.temperature}°</span>
               </Stream.Field>
             </div>
           </div>
@@ -129,7 +129,7 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
               <Droplets className="h-4 w-4" />
               <span className="min-w-8">
                 <Stream.Field fallback={<Skeleton className="inline-block h-4 w-8" />}>
-                  {data?.humidity !== undefined && `${data.humidity}%`}
+                  <span>{data?.humidity}%</span>
                 </Stream.Field>
               </span>
             </div>
@@ -137,7 +137,7 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
               <Wind className="h-4 w-4" />
               <span className="min-w-12">
                 <Stream.Field fallback={<Skeleton className="inline-block h-4 w-12" />}>
-                  {data?.windSpeed !== undefined && `${data.windSpeed} km/h`}
+                  <span>{data?.windSpeed} km/h</span>
                 </Stream.Field>
               </span>
             </div>

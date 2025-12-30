@@ -120,10 +120,7 @@ export function StreamRootDemo() {
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">temperature:</span>
                   <Stream.Field fallback={<Skeleton className="h-3 w-6" />}>
-                    <span>
-                      {data?.temperature}
-                      {data?.temperature !== undefined && "°"}
-                    </span>
+                    <span>{data?.temperature}°</span>
                   </Stream.Field>
                 </div>
                 <div className="flex items-center gap-2">

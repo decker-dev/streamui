@@ -1,0 +1,177 @@
+---
+title: Streaming Text
+description: Display text with an animated cursor while streaming from AI.
+---
+
+A simple component that shows a blinking cursor at the end of text while content is being streamed from an AI model.
+
+## Demo
+
+<DemoPreview>
+  <StreamingTextDemo />
+</DemoPreview>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]}>
+  <Tab value="CLI">
+
+```bash
+npx shadcn@latest add https://streamui.dev/r/streaming-text.json
+```
+
+  </Tab>
+  <Tab value="Manual">
+
+<Steps>
+  <Step>
+    ### Copy the component
+
+```tsx title="streaming-text.tsx"
+"use client";
+
+import { cn } from "@/lib/utils";
+
+interface StreamingTextProps {
+  children: string;
+  streaming?: boolean;
+  cursor?: string;
+  className?: string;
+  cursorClassName?: string;
+}
+
+export function StreamingText({
+  children,
+  streaming = false,
+  cursor = "▌",
+  className,
+  cursorClassName,
+}: StreamingTextProps) {
+  return (
+    <span className={cn("whitespace-pre-wrap", className)}>
+      {children}
+      {streaming && (
+        <span
+          className={cn(
+            "ml-0.5 inline-block animate-pulse",
+            cursorClassName
+          )}
+          aria-hidden="true"
+        >
+          {cursor}
+        </span>
+      )}
+    </span>
+  );
+}
+```
+
+  </Step>
+</Steps>
+
+  </Tab>
+</Tabs>
+
+## Usage
+
+### With useCompletion
+
+```tsx
+"use client";
+
+import { useCompletion } from "@ai-sdk/react";
+import { StreamingText } from "@/components/ui/streaming-text";
+
+export function ChatResponse() {
+  const { completion, isLoading } = useCompletion({
+    api: "/api/completion",
+  });
+
+  return (
+    <div className="prose">
+      <StreamingText streaming={isLoading}>
+        {completion}
+      </StreamingText>
+    </div>
+  );
+}
+```
+
+### With useChat
+
+```tsx
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { StreamingText } from "@/components/ui/streaming-text";
+
+export function ChatMessage({ message, isStreaming }) {
+  return (
+    <div className="rounded-lg border p-4">
+      <StreamingText streaming={isStreaming}>
+        {message.content}
+      </StreamingText>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Custom Cursor
+
+```tsx
+<StreamingText streaming={isLoading} cursor="●">
+  {text}
+</StreamingText>
+```
+
+### Custom Styling
+
+```tsx
+<StreamingText 
+  streaming={isLoading}
+  className="font-mono text-sm"
+  cursorClassName="text-blue-500"
+>
+  {text}
+</StreamingText>
+```
+
+### Block Cursor
+
+```tsx
+<StreamingText 
+  streaming={isLoading}
+  cursor="█"
+  cursorClassName="animate-blink"
+>
+  {text}
+</StreamingText>
+```
+
+Add custom blink animation in your CSS:
+
+```css
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+```
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `children` | `string` | — |
+| `streaming` | `boolean` | `false` |
+| `cursor` | `string` | `"▌"` |
+| `className` | `string` | — |
+| `cursorClassName` | `string` | — |
+
