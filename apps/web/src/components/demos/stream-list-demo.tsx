@@ -133,11 +133,11 @@ export function StreamListDemo() {
       <Card className={`py-0 transition-colors ${borderColors[currentState]}`}>
         <CardContent className="p-4">
           <div className="mb-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            path="items"
+            items
           </div>
           <Stream.Root data={data} isLoading={isLoading}>
-            <Stream.List path="items" fallback={<ListSkeleton />}>
-              {(items: Item[]) => (
+            <Stream.List items={data?.items as Item[] | undefined} fallback={<ListSkeleton />}>
+              {(items) => (
                 <div className="space-y-2">
                   {items.map((item) => (
                     <ItemCard key={item.id} item={item} />

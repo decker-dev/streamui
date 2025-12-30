@@ -82,28 +82,34 @@ export function StreamFieldDemo() {
             <div className="space-y-4">
               <div className="space-y-1">
                 <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  path="title"
+                  title
                 </div>
                 <div className="min-h-8 text-2xl font-bold tracking-tight">
-                  <Stream.Field path="title" fallback={<Skeleton className="h-8 w-40" />} />
+                  <Stream.Field fallback={<Skeleton className="h-8 w-40" />}>
+                    {data?.title}
+                  </Stream.Field>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  path="description"
+                  description
                 </div>
                 <div className="min-h-5 text-muted-foreground">
-                  <Stream.Field path="description" fallback={<Skeleton className="h-5 w-56" />} />
+                  <Stream.Field fallback={<Skeleton className="h-5 w-56" />}>
+                    {data?.description}
+                  </Stream.Field>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  path="value"
+                  value
                 </div>
                 <div className="min-h-10 text-4xl font-bold tabular-nums">
-                  <Stream.Field path="value" fallback={<Skeleton className="h-10 w-16" />} />
+                  <Stream.Field fallback={<Skeleton className="h-10 w-16" />}>
+                    {data?.value}
+                  </Stream.Field>
                 </div>
               </div>
             </div>

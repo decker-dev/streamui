@@ -44,15 +44,15 @@ bun add @stream.ui/react
 import { Stream } from "@stream.ui/react";
 
 function MyComponent() {
-  const { object, isLoading, error } = useObject({ ... });
+  const { object, isLoading, error } = useObject({ schema: mySchema });
 
   return (
     <Stream.Root data={object} isLoading={isLoading} error={error}>
-      <Stream.Field path="title" fallback={<Skeleton />}>
-        {(title) => <h1>{title}</h1>}
+      <Stream.Field fallback={<Skeleton />}>
+        <h1>{object?.title}</h1>
       </Stream.Field>
       
-      <Stream.List path="items" fallback={<ItemsSkeleton />}>
+      <Stream.List items={object?.items} fallback={<ItemsSkeleton />}>
         {(items) => items.map(item => <Item key={item.id} {...item} />)}
       </Stream.List>
       
@@ -73,7 +73,7 @@ function MyComponent() {
 | Primitive | Description |
 | --- | --- |
 | [`Stream.Root`](/docs/primitives/stream-root) | Provides context with streaming data and state |
-| [`Stream.Field`](/docs/primitives/stream-field) | Accesses a field by path with automatic fallback |
+| [`Stream.Field`](/docs/primitives/stream-field) | Renders content with fallback when undefined |
 | [`Stream.List`](/docs/primitives/stream-list) | Renders arrays that grow as data streams in |
 | [`Stream.When`](/docs/primitives/stream-when) | Conditionally renders based on stream state |
 
@@ -93,7 +93,7 @@ t=4: { title: "Hello", items: [{ id: 1 }, { id: 2 }] }
 The primitives handle this automatically:
 
 1. **Stream.Root** tracks the state (loading → streaming → complete)
-2. **Stream.Field** shows fallback until the field exists
+2. **Stream.Field** shows fallback until values are defined
 3. **Stream.List** renders items as they arrive
 4. **Stream.When** shows different UI based on state
 
@@ -109,33 +109,41 @@ The primitives handle this automatically:
 
 ## TypeScript
 
-The primitives are fully typed. You can pass a generic to `Stream.Root` and `Stream.Field` for type-safe access:
+The primitives work with your typed objects from `useObject`. Since you access your data directly (e.g., `object?.title`), you get full type safety and autocompletion from your schema.
 
 ```tsx
 import { Stream } from "@stream.ui/react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 
-interface WeatherData {
-  location: string;
-  temperature: number;
-  forecast: Array<{ day: string; high: number; low: number }>;
-}
+// Your schema defines the type
+const weatherSchema = z.object({
+  location: z.string(),
+  temperature: z.number(),
+  forecast: z.array(z.object({ day: z.string(), high: z.number(), low: z.number() })),
+});
 
 function WeatherCard() {
-  const { object, isLoading, error } = useObject<WeatherData>({
+  const { object, isLoading, error } = useObject({
     api: "/api/weather",
     schema: weatherSchema,
   });
 
   return (
-    <Stream.Root<WeatherData> data={object} isLoading={isLoading} error={error}>
-      <Stream.Field<string> path="location">
-        {(location) => <h1>{location}</h1>}
+    <Stream.Root data={object} isLoading={isLoading} error={error}>
+      {/* object?.location is typed as string | undefined */}
+      <Stream.Field fallback={<Skeleton />}>
+        <h1>{object?.location}</h1>
       </Stream.Field>
       
-      <Stream.Field<number> path="temperature">
-        {(temp) => <span>{temp}°</span>}
+      {/* object?.temperature is typed as number | undefined */}
+      <Stream.Field fallback={<Skeleton />}>
+        <span>{object?.temperature}°</span>
       </Stream.Field>
+
+      {/* object?.forecast is typed as the array from schema */}
+      <Stream.List items={object?.forecast} fallback={<Skeleton />}>
+        {(days) => days.map(day => <Day key={day.day} {...day} />)}
+      </Stream.List>
     </Stream.Root>
   );
 }
@@ -154,4 +162,3 @@ import type {
   StreamWhenProps,
 } from "@stream.ui/react";
 ```
-

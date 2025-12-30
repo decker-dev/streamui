@@ -28,17 +28,6 @@ const conditionIcons: Record<WeatherCondition, React.ElementType> = {
   partly_cloudy: CloudSun,
 };
 
-const conditionLabels: Record<WeatherCondition, string> = {
-  sunny: "Sunny",
-  cloudy: "Cloudy",
-  rainy: "Rainy",
-  snowy: "Snowy",
-  windy: "Windy",
-  stormy: "Stormy",
-  foggy: "Foggy",
-  partly_cloudy: "Partly Cloudy",
-};
-
 function WeatherIcon({ condition }: { condition?: WeatherCondition }) {
   if (!condition) return <Skeleton className="h-12 w-12 rounded-full" />;
   const Icon = conditionIcons[condition] ?? Cloud;
@@ -112,10 +101,14 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
           <div className="mb-4 flex items-start justify-between">
             <div className="space-y-1">
               <div className="min-h-7 text-xl font-semibold">
-                <Stream.Field path="location" fallback={<Skeleton className="h-7 w-32" />} />
+                <Stream.Field fallback={<Skeleton className="h-7 w-32" />}>
+                  {data?.location}
+                </Stream.Field>
               </div>
               <div className="min-h-5 text-sm text-muted-foreground">
-                <Stream.Field path="condition" fallback={<Skeleton className="h-4 w-20" />} />
+                <Stream.Field fallback={<Skeleton className="h-4 w-20" />}>
+                  {data?.condition}
+                </Stream.Field>
               </div>
             </div>
             <WeatherIcon condition={condition} />
@@ -124,7 +117,8 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
           {/* Temperature */}
           <div className="mb-4 min-h-16">
             <div className="text-6xl font-bold tabular-nums tracking-tighter">
-              <Stream.Field path="temperature" fallback={<Skeleton className="h-16 w-28" />}>
+              <Stream.Field fallback={<Skeleton className="h-16 w-28" />}>
+                {data?.temperature !== undefined && `${data.temperature}°`}
               </Stream.Field>
             </div>
           </div>
@@ -134,14 +128,16 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Droplets className="h-4 w-4" />
               <span className="min-w-8">
-                <Stream.Field path="humidity" fallback={<Skeleton className="inline-block h-4 w-8" />}>
+                <Stream.Field fallback={<Skeleton className="inline-block h-4 w-8" />}>
+                  {data?.humidity !== undefined && `${data.humidity}%`}
                 </Stream.Field>
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Wind className="h-4 w-4" />
               <span className="min-w-12">
-                <Stream.Field path="windSpeed" fallback={<Skeleton className="inline-block h-4 w-12" />}>
+                <Stream.Field fallback={<Skeleton className="inline-block h-4 w-12" />}>
+                  {data?.windSpeed !== undefined && `${data.windSpeed} km/h`}
                 </Stream.Field>
               </span>
             </div>
@@ -152,10 +148,10 @@ export function WeatherCard({ data, isLoading, error }: WeatherCardProps) {
             <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               3-Day Forecast  
             </div>
-            <Stream.List<{ day: string; high: number; low: number; condition: WeatherCondition }> path="forecast" fallback={<ForecastSkeleton />}>
-              {(forecast) => (
+            <Stream.List items={forecast} fallback={<ForecastSkeleton />}>
+              {(days) => (
                 <div className="flex justify-around">
-                  {forecast.map((day, index) => (
+                  {days.map((day, index) => (
                     <ForecastDay key={day.day ?? index} day={day} />
                   ))}
                 </div>

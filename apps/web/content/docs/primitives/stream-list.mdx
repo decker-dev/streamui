@@ -3,7 +3,7 @@ title: Stream.List
 description: Render arrays that grow as data streams in.
 ---
 
-`Stream.List` accesses an array field from the streaming data. Shows the fallback while the array is undefined, then renders children with the items as they arrive.
+`Stream.List` takes an array and renders it with a fallback while loading. It automatically filters out incomplete items during streaming.
 
 ## Demo
 
@@ -16,9 +16,11 @@ description: Render arrays that grow as data streams in.
 ```tsx
 import { Stream } from "@stream.ui/react";
 
+const { object, isLoading } = useObject({ schema: mySchema });
+
 <Stream.Root data={object} isLoading={isLoading}>
   <Stream.List
-    path="forecast"
+    items={object?.forecast}
     fallback={
       <div className="grid grid-cols-3 gap-4">
         {[0, 1, 2].map((i) => (
@@ -43,7 +45,7 @@ import { Stream } from "@stream.ui/react";
 ```tsx
 import { Stream } from "@stream.ui/react";
 
-<Stream.List path="arrayField" fallback={<Fallback />}>
+<Stream.List items={array} fallback={<Fallback />}>
   {(items) => items.map(item => <Item key={item.id} {...item} />)}
 </Stream.List>
 ```
@@ -53,7 +55,7 @@ import { Stream } from "@stream.ui/react";
 ### Basic List
 
 ```tsx
-<Stream.List path="results" fallback={<ResultsSkeleton />}>
+<Stream.List items={object?.results} fallback={<ResultsSkeleton />}>
   {(results) => (
     <ul className="space-y-2">
       {results.map((result) => (
@@ -70,7 +72,7 @@ import { Stream } from "@stream.ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 <Stream.List
-  path="products"
+  items={object?.products}
   fallback={
     <div className="grid grid-cols-3 gap-4">
       {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -89,10 +91,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 </Stream.List>
 ```
 
-### Nested List Path
+### Nested Arrays
 
 ```tsx
-<Stream.List path="user.posts" fallback={<PostsSkeleton />}>
+<Stream.List items={object?.user?.posts} fallback={<PostsSkeleton />}>
   {(posts) => posts.map(post => <PostCard key={post.id} post={post} />)}
 </Stream.List>
 ```
@@ -102,7 +104,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 Handle empty arrays by checking length:
 
 ```tsx
-<Stream.List path="notifications" fallback={<NotificationsSkeleton />}>
+<Stream.List items={object?.notifications} fallback={<NotificationsSkeleton />}>
   {(notifications) => 
     notifications.length === 0 ? (
       <EmptyState message="No notifications" />
@@ -133,7 +135,6 @@ The component automatically filters out `undefined` and empty items that may app
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `path` | `string` | — |
+| `items` | `T[] \| undefined` | — |
 | `fallback` | `ReactNode` | `null` |
 | `children` | `(items: T[]) => ReactNode` | — |
-

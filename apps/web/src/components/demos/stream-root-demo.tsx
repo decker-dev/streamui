@@ -22,8 +22,10 @@ const STREAM_SEQUENCE: WeatherData[] = [
 ];
 
 function ContextInspector({
+  data,
   state,
 }: {
+  data: WeatherData | undefined;
   state: "idle" | "loading" | "streaming" | "complete";
 }) {
   const stateColors = {
@@ -42,15 +44,21 @@ function ContextInspector({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">location:</span>
-            <Stream.Field path="location" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+              {data?.location}
+            </Stream.Field>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">temperature:</span>
-            <Stream.Field path="temperature" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+              {data?.temperature}
+            </Stream.Field>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">condition:</span>
-            <Stream.Field path="condition" fallback={<span className="text-muted-foreground/50">undefined</span>} />
+            <Stream.Field fallback={<span className="text-muted-foreground/50">undefined</span>}>
+              {data?.condition}
+            </Stream.Field>
           </div>
           <div className="flex items-center gap-2 pt-1">
             <span className="text-muted-foreground">state:</span>
@@ -105,24 +113,30 @@ export function StreamRootDemo() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">location:</span>
-                  <Stream.Field path="location" fallback={<Skeleton className="h-3 w-10" />} />
+                  <Stream.Field fallback={<Skeleton className="h-3 w-10" />}>
+                    {data?.location}
+                  </Stream.Field>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">temperature:</span>
-                  <span>
-                    <Stream.Field path="temperature" fallback={<Skeleton className="h-3 w-6" />} />
-                    {data?.temperature !== undefined && "°"}
-                  </span>
+                  <Stream.Field fallback={<Skeleton className="h-3 w-6" />}>
+                    <span>
+                      {data?.temperature}
+                      {data?.temperature !== undefined && "°"}
+                    </span>
+                  </Stream.Field>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">condition:</span>
-                  <Stream.Field path="condition" fallback={<Skeleton className="h-3 w-10" />} />
+                  <Stream.Field fallback={<Skeleton className="h-3 w-10" />}>
+                    {data?.condition}
+                  </Stream.Field>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <ContextInspector state={currentState} />
+          <ContextInspector data={data} state={currentState} />
         </div>
       </Stream.Root>
     </div>

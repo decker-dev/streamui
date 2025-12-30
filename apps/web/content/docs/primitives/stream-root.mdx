@@ -26,16 +26,12 @@ function WeatherCard() {
   return (
     <Stream.Root data={object} isLoading={isLoading} error={error}>
       <div className="rounded-2xl border bg-card p-6">
-        <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
-          {(location) => (
-            <h3 className="text-lg font-semibold">{location}</h3>
-          )}
+        <Stream.Field fallback={<Skeleton className="h-6 w-32" />}>
+          <h3 className="text-lg font-semibold">{object?.location}</h3>
         </Stream.Field>
         
-        <Stream.Field path="temperature" fallback={<Skeleton className="h-12 w-20" />}>
-          {(temp) => (
-            <span className="text-5xl font-bold">{temp}°</span>
-          )}
+        <Stream.Field fallback={<Skeleton className="h-12 w-20" />}>
+          <span className="text-5xl font-bold">{object?.temperature}°</span>
         </Stream.Field>
         
         <Stream.When streaming>
@@ -92,4 +88,3 @@ import { Stream } from "@stream.ui/react";
 | `isStreaming` | `boolean` |
 | `isComplete` | `boolean` |
 | `error` | `Error \| undefined` |
-

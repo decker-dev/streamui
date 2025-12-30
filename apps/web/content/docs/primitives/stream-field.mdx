@@ -1,9 +1,9 @@
 ---
 title: Stream.Field
-description: Access a field from streaming data with automatic fallback.
+description: Render content with automatic fallback when data is undefined.
 ---
 
-`Stream.Field` accesses a field from the streaming data using dot notation path. Shows the fallback while the field is undefined, then renders children with the value once available.
+`Stream.Field` inspects its children for `undefined` values. If any are found (indicating a streamed field hasn't arrived yet), it shows the fallback. Otherwise, it renders the children as-is.
 
 ## Demo
 
@@ -16,22 +16,22 @@ description: Access a field from streaming data with automatic fallback.
 ```tsx
 import { Stream } from "@stream.ui/react";
 
+const { object, isLoading } = useObject({ schema: mySchema });
+
 <Stream.Root data={object} isLoading={isLoading}>
-  {/* Basic field access */}
-  <Stream.Field path="location" fallback={<Skeleton className="h-6 w-32" />}>
-    {(location) => (
-      <h3 className="text-lg font-semibold">{location}</h3>
-    )}
+  {/* Shows fallback while object?.location is undefined */}
+  <Stream.Field fallback={<Skeleton className="h-6 w-32" />}>
+    <h3 className="text-lg font-semibold">{object?.location}</h3>
   </Stream.Field>
 
-  {/* Nested path access */}
-  <Stream.Field path="user.profile.name" fallback={<Skeleton className="h-4 w-24" />}>
-    {(name) => <span>{name}</span>}
+  {/* Works with any JSX structure */}
+  <Stream.Field fallback={<Skeleton className="h-4 w-24" />}>
+    <span className="text-4xl">{object?.temperature}°C</span>
   </Stream.Field>
 
-  {/* Array index access */}
-  <Stream.Field path="items.0.title" fallback={<Skeleton className="h-4 w-32" />}>
-    {(title) => <h4>{title}</h4>}
+  {/* Also works with just the value */}
+  <Stream.Field fallback={<Skeleton className="h-4 w-16" />}>
+    {object?.humidity}%
   </Stream.Field>
 </Stream.Root>
 ```
@@ -41,8 +41,8 @@ import { Stream } from "@stream.ui/react";
 ```tsx
 import { Stream } from "@stream.ui/react";
 
-<Stream.Field path="fieldName" fallback={<Fallback />}>
-  {(value) => <YourComponent value={value} />}
+<Stream.Field fallback={<Fallback />}>
+  {/* Any content - shows fallback if contains undefined */}
 </Stream.Field>
 ```
 
@@ -53,54 +53,56 @@ import { Stream } from "@stream.ui/react";
 ```tsx
 import { Skeleton } from "@/components/ui/skeleton";
 
-<Stream.Field 
-  path="temperature" 
-  fallback={<Skeleton className="h-12 w-20 rounded-md" />}
->
-  {(temp) => (
-    <span className="text-5xl font-bold tabular-nums">
-      {Math.round(temp)}°
-    </span>
-  )}
+<Stream.Field fallback={<Skeleton className="h-12 w-20 rounded-md" />}>
+  <span className="text-5xl font-bold tabular-nums">
+    {object?.temperature}°
+  </span>
 </Stream.Field>
 ```
 
-### Nested Object Path
+### Nested Content
 
-Access deeply nested properties using dot notation:
+Works with any JSX structure:
 
 ```tsx
 import { Droplets } from "lucide-react";
 
-<Stream.Field path="weather.current.humidity">
-  {(humidity) => (
-    <div className="flex items-center gap-1.5">
-      <Droplets className="h-4 w-4" />
-      <span>{humidity}%</span>
-    </div>
-  )}
+<Stream.Field fallback={<Skeleton className="h-6 w-24" />}>
+  <div className="flex items-center gap-1.5">
+    <Droplets className="h-4 w-4" />
+    <span>{object?.humidity}%</span>
+  </div>
 </Stream.Field>
 ```
 
-### Array Index Path
+### Multiple Values
 
-Access array items by index:
+If any value is undefined, the fallback shows:
 
 ```tsx
-<Stream.Field path="forecast.0.condition">
-  {(condition) => <WeatherIcon condition={condition} />}
+<Stream.Field fallback={<Skeleton className="h-6 w-32" />}>
+  <span>{object?.city}, {object?.country}</span>
 </Stream.Field>
 ```
 
 ### Without Fallback
 
-If no fallback is provided, nothing renders until the field exists:
+If no fallback is provided, nothing renders until all values exist:
 
 ```tsx
-<Stream.Field path="optionalField">
-  {(value) => <OptionalContent value={value} />}
+<Stream.Field>
+  <OptionalContent value={object?.optional} />
 </Stream.Field>
 ```
+
+## How It Works
+
+`Stream.Field` recursively inspects its children:
+
+1. If children contains `undefined` or `null` anywhere → render fallback
+2. Otherwise → render children as-is
+
+This means you can put any JSX inside and it "just works" with your typed object.
 
 ## API Reference
 
@@ -108,18 +110,5 @@ If no fallback is provided, nothing renders until the field exists:
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `path` | `string` | — |
 | `fallback` | `ReactNode` | `null` |
-| `children` | `(value: T) => ReactNode` | — |
-
-### Path Syntax
-
-The `path` prop supports dot notation for accessing nested values:
-
-| Path | Accesses |
-| --- | --- |
-| `"name"` | `data.name` |
-| `"user.email"` | `data.user.email` |
-| `"items.0"` | `data.items[0]` |
-| `"items.0.title"` | `data.items[0].title` |
-
+| `children` | `ReactNode` | — |

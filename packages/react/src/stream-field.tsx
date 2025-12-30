@@ -1,59 +1,64 @@
-import type { ReactNode } from "react";
-import { getByPath, useStreamContext } from "./context";
+import { isValidElement, type ReactNode } from "react";
 import type { StreamFieldProps } from "./types";
 
 /**
- * Stream.Field - Renders a field value from streaming data with automatic fallback.
- * 
- * Accesses a field from the streaming data using dot notation path.
- * Renders the value directly, or shows the fallback while the field is undefined.
- * 
- * @example
- * ```tsx
- * // Simple field access
- * <h1>
- *   <Stream.Field path="title" fallback={<Skeleton className="h-8 w-32" />} />
- * </h1>
- * 
- * // With formatting (wrap with your own components)
- * <span>
- *   <Stream.Field path="temperature" fallback={<Skeleton />} />°C
- * </span>
- * 
- * // Nested path access
- * <p>
- *   <Stream.Field path="user.profile.name" fallback={<Skeleton />} />
- * </p>
- * ```
+ * Recursively checks if a React node tree contains undefined or null values.
+ * This allows detecting when a streamed field hasn't arrived yet.
  */
-function isEmptyValue(value: unknown): boolean {
-  if (value === undefined || value === null) {
+function containsUndefined(node: ReactNode): boolean {
+  // Direct undefined/null check
+  if (node === undefined || node === null) {
     return true;
   }
-  
-  if (typeof value === "string" && value === "") {
-    return true;
+
+  // Check arrays (e.g., fragment children)
+  if (Array.isArray(node)) {
+    return node.some(containsUndefined);
   }
-  
-  if (typeof value === "object" && !Array.isArray(value)) {
-    return Object.keys(value).length === 0;
+
+  // Check React element children
+  if (isValidElement(node)) {
+    const { children } = node.props as { children?: ReactNode };
+    if (children !== undefined) {
+      return containsUndefined(children);
+    }
   }
-  
+
   return false;
 }
 
+/**
+ * Stream.Field - Renders children or fallback based on undefined detection.
+ *
+ * Inspects the children tree for undefined values. If any undefined is found
+ * (indicating a streamed field hasn't arrived), shows the fallback.
+ * Otherwise renders the children as-is.
+ *
+ * @example
+ * ```tsx
+ * const { object } = useObject({ schema: weatherSchema });
+ *
+ * <Stream.Field fallback={<Skeleton className="h-8 w-32" />}>
+ *   <h1>{object?.location}</h1>
+ * </Stream.Field>
+ *
+ * <Stream.Field fallback={<Skeleton className="h-12 w-20" />}>
+ *   <span className="text-4xl">{object?.temperature}°C</span>
+ * </Stream.Field>
+ *
+ * // Also works with just the value
+ * <Stream.Field fallback={<Skeleton />}>
+ *   {object?.humidity}%
+ * </Stream.Field>
+ * ```
+ */
 export function StreamField({
-  path,
   fallback = null,
+  children,
 }: StreamFieldProps): ReactNode {
-  const { data } = useStreamContext();
-  const value = getByPath(data, path);
-
-  if (isEmptyValue(value)) {
+  if (containsUndefined(children)) {
     return fallback;
   }
 
-  // Render the value directly (primitives become text nodes)
-  return <>{value}</>;
+  return children;
 }
-
