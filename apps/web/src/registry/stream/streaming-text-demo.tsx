@@ -2,36 +2,33 @@
 
 import * as React from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { Send } from "lucide-react";
+import { MessageSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { StreamingText } from "./streaming-text";
 import { streamingTextSchema } from "./streaming-text-schema";
 
-const suggestions = [
-  "What is React?",
-  "Explain TypeScript",
-  "What is streaming?",
+const presets = [
+  { label: "React", prompt: "What is React?" },
+  { label: "TypeScript", prompt: "Explain TypeScript" },
+  { label: "Streaming", prompt: "What is streaming?" },
+  { label: "Next.js", prompt: "What is Next.js?" },
 ];
 
 export function StreamingTextDemo() {
-  const [inputValue, setInputValue] = React.useState("");
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [selectedPreset, setSelectedPreset] = React.useState(presets[0]);
 
   const { object, isLoading, submit } = useObject({
     api: "/api/stream/text",
     schema: streamingTextSchema,
   });
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
-    submit({ prompt: inputValue });
+  const handlePreset = (preset: (typeof presets)[number]) => {
+    setSelectedPreset(preset);
+    submit({ prompt: preset.prompt });
   };
 
-  const handleSuggestion = (suggestion: string) => {
-    setInputValue(suggestion);
-    submit({ prompt: suggestion });
+  const handleRefresh = () => {
+    submit({ prompt: selectedPreset.prompt });
   };
 
   return (
@@ -39,7 +36,7 @@ export function StreamingTextDemo() {
       <div className="rounded-xl border bg-card p-4 min-h-[120px]">
         {!object?.text && !isLoading ? (
           <span className="text-muted-foreground">
-            Ask something to see streaming text…
+            Click a button to see streaming text…
           </span>
         ) : (
           <StreamingText streaming={isLoading} smooth>
@@ -48,46 +45,30 @@ export function StreamingTextDemo() {
         )}
       </div>
 
-      <form onSubmit={onSubmit} className="flex gap-2">
-        <Input
-          ref={inputRef}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask anything…"
-          disabled={isLoading}
-          className="flex-1"
-        />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={isLoading || !inputValue.trim()}
-        >
-          <Send className="h-4 w-4" />
-          <span className="sr-only">Send</span>
-        </Button>
-      </form>
-
-      <div className="flex flex-wrap justify-center gap-2">
-        {suggestions.map((suggestion) => (
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {presets.map((preset) => (
           <Button
-            key={suggestion}
-            variant="outline"
+            key={preset.label}
+            variant={selectedPreset.label === preset.label ? "default" : "outline"}
             size="sm"
-            onClick={() => handleSuggestion(suggestion)}
+            onClick={() => handlePreset(preset)}
             disabled={isLoading}
+            className="gap-1.5"
           >
-            {suggestion}
+            <MessageSquare className="h-3.5 w-3.5" />
+            {preset.label}
           </Button>
         ))}
-      </div>
-
-      <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5">
-          <span
-            className={`h-2 w-2 rounded-full ${isLoading ? "bg-blue-500 animate-pulse" : object?.text ? "bg-green-500" : "bg-muted"}`}
-          />
-          {isLoading ? "Streaming" : object?.text ? "Complete" : "Idle"}
-        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className="gap-1.5"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
       </div>
     </div>
   );
