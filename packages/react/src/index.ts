@@ -26,8 +26,8 @@ import { StreamWhen } from "./stream-when";
  *         <p className="text-lg">{object?.summary}</p>
  *       </Stream.Field>
  *
- *       <Stream.List items={object?.sections} fallback={<SectionsSkeleton />}>
- *         {(sections) => sections.map((s) => <Section key={s.heading} {...s} />)}
+ *       <Stream.List fallback={<SectionsSkeleton />}>
+ *         {object?.sections?.map((s) => <Section key={s.heading} {...s} />)}
  *       </Stream.List>
  *
  *       <Stream.When streaming>

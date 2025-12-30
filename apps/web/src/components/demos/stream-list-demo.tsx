@@ -136,14 +136,10 @@ export function StreamListDemo() {
             items
           </div>
           <Stream.Root data={data} isLoading={isLoading}>
-            <Stream.List items={data?.items as Item[] | undefined} fallback={<ListSkeleton />}>
-              {(items) => (
-                <div className="space-y-2">
-                  {items.map((item) => (
-                    <ItemCard key={item.id} item={item} />
-                  ))}
-                </div>
-              )}
+            <Stream.List fallback={<ListSkeleton />}>
+              {(data?.items as Item[] | undefined)?.map((item) => (
+                <ItemCard key={item.id} item={item} />
+              ))}
             </Stream.List>
           </Stream.Root>
         </CardContent>

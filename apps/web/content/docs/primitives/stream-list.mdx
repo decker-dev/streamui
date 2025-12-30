@@ -3,7 +3,7 @@ title: Stream.List
 description: Render arrays that grow as data streams in.
 ---
 
-`Stream.List` takes an array and renders it with a fallback while loading. It automatically filters out incomplete items during streaming.
+`Stream.List` renders array children with automatic fallback. It filters out incomplete items (those containing `undefined`) during streaming and shows fallback when no valid children exist.
 
 ## Demo
 
@@ -20,7 +20,6 @@ const { object, isLoading } = useObject({ schema: mySchema });
 
 <Stream.Root data={object} isLoading={isLoading}>
   <Stream.List
-    items={object?.forecast}
     fallback={
       <div className="grid grid-cols-3 gap-4">
         {[0, 1, 2].map((i) => (
@@ -29,13 +28,9 @@ const { object, isLoading } = useObject({ schema: mySchema });
       </div>
     }
   >
-    {(days) => (
-      <div className="grid grid-cols-3 gap-4">
-        {days.map((day) => (
-          <ForecastDay key={day.id} {...day} />
-        ))}
-      </div>
-    )}
+    {object?.forecast?.map((day) => (
+      <ForecastDay key={day.id} {...day} />
+    ))}
   </Stream.List>
 </Stream.Root>
 ```
@@ -45,8 +40,8 @@ const { object, isLoading } = useObject({ schema: mySchema });
 ```tsx
 import { Stream } from "@stream.ui/react";
 
-<Stream.List items={array} fallback={<Fallback />}>
-  {(items) => items.map(item => <Item key={item.id} {...item} />)}
+<Stream.List fallback={<Fallback />}>
+  {array?.map(item => <Item key={item.id} {...item} />)}
 </Stream.List>
 ```
 
@@ -55,14 +50,10 @@ import { Stream } from "@stream.ui/react";
 ### Basic List
 
 ```tsx
-<Stream.List items={object?.results} fallback={<ResultsSkeleton />}>
-  {(results) => (
-    <ul className="space-y-2">
-      {results.map((result) => (
-        <li key={result.id}>{result.title}</li>
-      ))}
-    </ul>
-  )}
+<Stream.List fallback={<ResultsSkeleton />}>
+  {object?.results?.map((result) => (
+    <li key={result.id}>{result.title}</li>
+  ))}
 </Stream.List>
 ```
 
@@ -72,7 +63,6 @@ import { Stream } from "@stream.ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 <Stream.List
-  items={object?.products}
   fallback={
     <div className="grid grid-cols-3 gap-4">
       {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -81,37 +71,33 @@ import { Skeleton } from "@/components/ui/skeleton";
     </div>
   }
 >
-  {(products) => (
-    <div className="grid grid-cols-3 gap-4">
-      {products.map((product) => (
-        <ProductCard key={product.id} {...product} />
-      ))}
-    </div>
-  )}
+  {object?.products?.map((product) => (
+    <ProductCard key={product.id} {...product} />
+  ))}
 </Stream.List>
 ```
 
 ### Nested Arrays
 
 ```tsx
-<Stream.List items={object?.user?.posts} fallback={<PostsSkeleton />}>
-  {(posts) => posts.map(post => <PostCard key={post.id} post={post} />)}
+<Stream.List fallback={<PostsSkeleton />}>
+  {object?.user?.posts?.map((post) => (
+    <PostCard key={post.id} post={post} />
+  ))}
 </Stream.List>
 ```
 
-### With Empty State
+### With Wrapper Element
 
-Handle empty arrays by checking length:
+Wrap children in a container:
 
 ```tsx
-<Stream.List items={object?.notifications} fallback={<NotificationsSkeleton />}>
-  {(notifications) => 
-    notifications.length === 0 ? (
-      <EmptyState message="No notifications" />
-    ) : (
-      notifications.map(n => <Notification key={n.id} {...n} />)
-    )
-  }
+<Stream.List fallback={<Skeleton className="h-32" />}>
+  <ul className="space-y-2">
+    {object?.items?.map((item) => (
+      <li key={item.id}>{item.name}</li>
+    ))}
+  </ul>
 </Stream.List>
 ```
 
@@ -120,14 +106,18 @@ Handle empty arrays by checking length:
 As the array streams in, items appear incrementally:
 
 ```
-t=0: fallback shown (array undefined)
-t=1: fallback shown (empty array [])
-t=2: children([item1])
-t=3: children([item1, item2])
+t=0: fallback shown (children is undefined)
+t=1: fallback shown (all items contain undefined)
+t=2: [<Item1 />] (first complete item)
+t=3: [<Item1 />, <Item2 />] (second complete item)
 ...
 ```
 
-The component automatically filters out `undefined` and empty items that may appear during streaming. The fallback is shown until at least one valid item exists.
+The component:
+1. Shows fallback if children is `undefined` or `null`
+2. Filters out elements that contain `undefined` values (incomplete items)
+3. Shows fallback if no valid elements remain
+4. Renders valid elements as-is
 
 ## API Reference
 
@@ -135,6 +125,5 @@ The component automatically filters out `undefined` and empty items that may app
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `items` | `T[] \| undefined` | — |
 | `fallback` | `ReactNode` | `null` |
-| `children` | `(items: T[]) => ReactNode` | — |
+| `children` | `ReactNode` | — |

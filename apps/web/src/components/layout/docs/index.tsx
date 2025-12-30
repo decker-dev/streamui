@@ -139,7 +139,6 @@ export function DocsLayout({
           />
         ))}
         <SidebarPageTree {...components} />
-        <SidebarExternalLinks />
       </SidebarViewport>
     );
 

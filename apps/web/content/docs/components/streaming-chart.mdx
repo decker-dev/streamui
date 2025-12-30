@@ -167,13 +167,13 @@ The component uses Stream UI primitives for progressive rendering:
 
     <CardContent>
       {/* Chart with custom animated bars */}
-      <Stream.List items={chartData} fallback={<ChartSkeleton />}>
-        {(items) => (
-          <BarChart data={items}>
+      <Stream.Field fallback={<ChartSkeleton />}>
+        {chartData && chartData.length > 0 && (
+          <BarChart data={chartData}>
             <Bar dataKey="value" shape={CustomBar} />
           </BarChart>
         )}
-      </Stream.List>
+      </Stream.Field>
     </CardContent>
   </Card>
 </Stream.Root>

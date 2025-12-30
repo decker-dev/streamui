@@ -52,8 +52,8 @@ function MyComponent() {
         <h1>{object?.title}</h1>
       </Stream.Field>
       
-      <Stream.List items={object?.items} fallback={<ItemsSkeleton />}>
-        {(items) => items.map(item => <Item key={item.id} {...item} />)}
+      <Stream.List fallback={<ItemsSkeleton />}>
+        {object?.items?.map(item => <Item key={item.id} {...item} />)}
       </Stream.List>
       
       <Stream.When loading>
@@ -141,8 +141,8 @@ function ArticleCard() {
       </Stream.Field>
 
       {/* object?.sections is typed as the array from schema */}
-      <Stream.List items={object?.sections} fallback={<Skeleton />}>
-        {(sections) => sections.map(section => <Section key={section.heading} {...section} />)}
+      <Stream.List fallback={<Skeleton />}>
+        {object?.sections?.map(section => <Section key={section.heading} {...section} />)}
       </Stream.List>
     </Stream.Root>
   );

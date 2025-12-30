@@ -1,74 +1,77 @@
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode, Children } from "react";
 import type { StreamListProps } from "./types";
 
 /**
- * Check if an item is empty/incomplete during streaming.
+ * Recursively checks if a React node tree contains undefined or null values.
+ * This allows detecting when a streamed item hasn't arrived yet.
  */
-function isEmptyItem(item: unknown): boolean {
-  if (item === undefined || item === null) {
+function containsUndefined(node: ReactNode): boolean {
+  // Direct undefined/null check
+  if (node === undefined || node === null) {
     return true;
   }
 
-  // Empty object (partial item during streaming)
-  if (typeof item === "object" && !Array.isArray(item)) {
-    return Object.keys(item).length === 0;
+  // Check arrays (e.g., fragment children)
+  if (Array.isArray(node)) {
+    return node.some(containsUndefined);
+  }
+
+  // Check React element children
+  if (isValidElement(node)) {
+    const { children } = node.props as { children?: ReactNode };
+    if (children !== undefined) {
+      return containsUndefined(children);
+    }
   }
 
   return false;
 }
 
 /**
- * Stream.List - Renders an array with automatic fallback and filtering.
+ * Stream.List - Renders array children with automatic fallback.
  *
- * Shows the fallback while items is undefined or empty. Once items arrive,
- * filters out incomplete items and renders children with the valid ones.
+ * Filters out children that contain undefined values (incomplete items during
+ * streaming) and shows fallback when no valid children exist.
  *
  * @example
  * ```tsx
  * const { object } = useObject({ schema: articleSchema });
  *
- * <Stream.List items={object?.sections} fallback={<SectionsSkeleton />}>
- *   {(sections) => (
- *     <div className="space-y-4">
- *       {sections.map((section) => (
- *         <Section key={section.heading} {...section} />
- *       ))}
- *     </div>
- *   )}
+ * <Stream.List fallback={<SectionsSkeleton />}>
+ *   {object?.sections?.map((section) => (
+ *     <Section key={section.heading} {...section} />
+ *   ))}
  * </Stream.List>
  *
  * // With inline skeleton
  * <Stream.List
- *   items={object?.results}
  *   fallback={
  *     <div className="space-y-2">
  *       {[0, 1, 2].map((i) => <Skeleton key={i} className="h-20" />)}
  *     </div>
  *   }
  * >
- *   {(results) => results.map((r) => <ResultCard key={r.id} {...r} />)}
+ *   {object?.results?.map((r) => <ResultCard key={r.id} {...r} />)}
  * </Stream.List>
  * ```
  */
-export function StreamList<T>({
-  items,
+export function StreamList({
   fallback = null,
   children,
-}: StreamListProps<T>): ReactNode {
-  // Show fallback if items is undefined or null
-  if (items === undefined || items === null) {
+}: StreamListProps): ReactNode {
+  // If children is undefined or null (array hasn't arrived yet)
+  if (children === undefined || children === null) {
     return fallback;
   }
 
-  // Filter out undefined and empty items (partial array during streaming)
-  const validItems = items.filter(
-    (item): item is NonNullable<T> => !isEmptyItem(item)
-  );
+  // Convert to array and filter out incomplete elements
+  const childArray = Children.toArray(children);
+  const validChildren = childArray.filter((child) => !containsUndefined(child));
 
   // Show fallback if no valid items yet
-  if (validItems.length === 0) {
+  if (validChildren.length === 0) {
     return fallback;
   }
 
-  return children(validItems);
+  return <>{validChildren}</>;
 }

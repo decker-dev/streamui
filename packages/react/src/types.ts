@@ -46,12 +46,11 @@ export interface StreamFieldProps {
 
 /**
  * Props for Stream.List component.
- * Shows fallback if items is undefined/null/empty, otherwise renders with valid items.
+ * Shows fallback if children is undefined or contains only incomplete items.
  */
-export interface StreamListProps<T> {
-  items: T[] | null | undefined;
+export interface StreamListProps {
   fallback?: ReactNode;
-  children: (items: NonNullable<T>[]) => ReactNode;
+  children?: ReactNode;
 }
 
 /**
