@@ -20,10 +20,8 @@ interface PartialData {
 
 const ITEMS: Item[] = [
   { id: 1, name: "Authentication", status: "done" },
-  { id: 2, name: "Database setup", status: "done" },
-  { id: 3, name: "API routes", status: "active" },
-  { id: 4, name: "UI components", status: "pending" },
-  { id: 5, name: "Testing", status: "pending" },
+  { id: 2, name: "Database setup", status: "active" },
+  { id: 3, name: "API routes", status: "pending" },
 ];
 
 function ItemCard({ item }: { item: Item }) {
