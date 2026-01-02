@@ -11,27 +11,29 @@ const presets = [
   {
     label: "I want to visit all the FAANG campuses in one day",
     prompt:
-      "Plan a day trip to visit the main FAANG headquarters in the San Francisco Bay Area. Include 5-6 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
+      "Plan a day trip to visit the main FAANG headquarters in the San Francisco Bay Area. Include 4-5 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
   },
   {
     label: "Planning a figure hunting day in Den Den Town",
     prompt:
-      "Plan a day trip to Osaka's Den Den Town to hunt for rare anime figures. Include 5-6 stops with the best figure shops, Mandarake locations, and stores for limited collectibles.",
+      "Plan a day trip to Osaka's Den Den Town to hunt for rare anime figures. Include 3-4 stops with the best figure shops, Mandarake locations, and stores for limited collectibles.",
   },
   {
     label: "I want to visit where Korean esports pros train",
     prompt:
-      "Plan a day in Seoul visiting spots where pro gamers train and compete. Include 5-6 stops with famous PC bangs, esports facilities, and gaming cafes in Gangnam.",
+      "Plan a day in Seoul visiting spots where pro gamers train and compete. Include 3-4 stops with famous PC bangs, esports facilities, and gaming cafes in Gangnam.",
   },
   {
     label: "A day hitting retro arcades in Akihabara",
     prompt:
-      "Plan a day visiting the best retro gaming arcades in Akihabara. Include 5-6 stops with arcades that have classic cabinets, rhythm games, and fighting game setups.",
+      "Plan a day visiting the best retro gaming arcades in Akihabara. Include 3-4 stops with arcades that have classic cabinets, rhythm games, and fighting game setups.",
   },
 ];
 
 export function StreamingItineraryDemo() {
-  const [selectedPreset, setSelectedPreset] = React.useState(presets[0]);
+  const [selectedPreset, setSelectedPreset] = React.useState<
+    (typeof presets)[number] | null
+  >(null);
 
   const { object, submit, isLoading, error } = useObject({
     api: "/api/stream/itinerary",
@@ -62,7 +64,7 @@ export function StreamingItineraryDemo() {
           <Button
             key={preset.label}
             variant={
-              selectedPreset.label === preset.label ? "default" : "outline"
+              selectedPreset?.label === preset.label ? "default" : "outline"
             }
             size="sm"
             onClick={() => handlePreset(preset)}
