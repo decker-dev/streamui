@@ -9,24 +9,24 @@ import { streamingItinerarySchema } from "./streaming-itinerary-schema";
 
 const presets = [
   {
-    label: "Tokyo Food",
+    label: "I want to visit all the FAANG campuses in one day",
     prompt:
-      "Plan a food lover's day trip in Tokyo, Japan. Include 5-6 stops with famous restaurants, street food spots, and local markets.",
+      "Plan a day trip to visit the main FAANG headquarters in the San Francisco Bay Area. Include 5-6 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
   },
   {
-    label: "Paris Art",
+    label: "Planning a figure hunting day in Den Den Town",
     prompt:
-      "Plan a cultural day in Paris, France. Include 5-6 stops with museums, galleries, and artistic landmarks.",
+      "Plan a day trip to Osaka's Den Den Town to hunt for rare anime figures. Include 5-6 stops with the best figure shops, Mandarake locations, and stores for limited collectibles.",
   },
   {
-    label: "NYC Walk",
+    label: "I want to visit where Korean esports pros train",
     prompt:
-      "Plan a walking tour of Manhattan, New York. Include 5-6 iconic landmarks and attractions.",
+      "Plan a day in Seoul visiting spots where pro gamers train and compete. Include 5-6 stops with famous PC bangs, esports facilities, and gaming cafes in Gangnam.",
   },
   {
-    label: "Barcelona",
+    label: "A day hitting retro arcades in Akihabara",
     prompt:
-      "Plan a day exploring Barcelona, Spain. Include 5-6 stops with Gaudí architecture, beaches, and tapas spots.",
+      "Plan a day visiting the best retro gaming arcades in Akihabara. Include 5-6 stops with arcades that have classic cabinets, rhythm games, and fighting game setups.",
   },
 ];
 
