@@ -13,20 +13,39 @@ A trip planning component that progressively reveals stops on an interactive map
   code={`"use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { MapPin } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { StreamingItinerary } from "@/components/ui/streaming-itinerary";
 import { streamingItinerarySchema } from "@/components/ui/streaming-itinerary-schema";
 
 const presets = [
-  { label: "Tokyo Food", prompt: "Plan a food lover's day trip in Tokyo" },
-  { label: "Paris Art", prompt: "Plan a cultural day in Paris with museums" },
-  { label: "NYC Walk", prompt: "Plan a walking tour of Manhattan landmarks" },
+  {
+    label: "I want to visit Big Tech campuses in one day",
+    prompt:
+      "Plan a day trip to visit major tech company headquarters in the San Francisco Bay Area. Include 4-5 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
+  },
+  {
+    label: "Planning a figure hunting day in Den Den Town",
+    prompt:
+      "Plan a day trip to Osaka's Den Den Town to hunt for rare anime figures. Include 3-4 stops with the best figure shops, Mandarake locations, and stores for limited collectibles.",
+  },
+  {
+    label: "I want to visit where Korean esports pros train",
+    prompt:
+      "Plan a day in Seoul visiting spots where pro gamers train and compete. Include 3-4 stops with famous PC bangs, esports facilities, and gaming cafes in Gangnam.",
+  },
+  {
+    label: "A day hitting retro arcades in Akihabara",
+    prompt:
+      "Plan a day visiting the best retro gaming arcades in Akihabara. Include 3-4 stops with arcades that have classic cabinets, rhythm games, and fighting game setups.",
+  },
 ];
 
 export function StreamingItineraryDemo() {
-  const [selectedPreset, setSelectedPreset] = React.useState(presets[0]);
+  const [selectedPreset, setSelectedPreset] = React.useState<
+    (typeof presets)[number] | null
+  >(null);
 
   const { object, submit, isLoading, error } = useObject({
     api: "/api/stream/itinerary",
@@ -46,18 +65,37 @@ export function StreamingItineraryDemo() {
         error={error ?? undefined}
       />
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      {error && (
+        <p
+          className="text-center text-sm text-destructive"
+          role="alert"
+          aria-live="polite"
+        >
+          Error: {error.message}
+        </p>
+      )}
+
+      <div className="grid grid-cols-2 gap-2">
         {presets.map((preset) => (
           <Button
             key={preset.label}
-            variant={selectedPreset.label === preset.label ? "default" : "outline"}
+            variant={
+              selectedPreset?.label === preset.label ? "default" : "outline"
+            }
             size="sm"
             onClick={() => handlePreset(preset)}
             disabled={isLoading}
-            className="gap-1.5"
+            className="justify-start gap-1.5"
           >
-            <MapPin className="h-3.5 w-3.5" />
-            {preset.label}
+            {isLoading && selectedPreset?.label === preset.label ? (
+              <Loader2
+                className="h-3.5 w-3.5 shrink-0 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            )}
+            <span className="truncate">{preset.label}</span>
           </Button>
         ))}
       </div>
@@ -106,28 +144,38 @@ export type StreamingItineraryData = z.infer<typeof streamingItinerarySchema>;
 ```
 
 ```tsx title="app/api/stream/itinerary/route.ts"
-import { openai } from "@ai-sdk/openai";
-import { streamObject } from "ai";
+import { gateway, Output, streamText } from "ai";
 import { streamingItinerarySchema } from "@/components/ui/streaming-itinerary-schema";
 
 export async function POST(request: Request) {
   const { prompt } = await request.json();
 
-  const result = streamObject({
-    model: openai("gpt-4o-mini"),
-    schema: streamingItinerarySchema,
-    system: `You are a travel planning assistant. Generate detailed itineraries with real, accurate locations.
+  const result = streamText({
+    model: gateway("openai/gpt-4.1-mini"),
+    output: Output.object({ schema: streamingItinerarySchema }),
+    system: \`You are a travel planning assistant. Generate detailed itineraries with real, accurate locations.
 
 For each stop, provide:
-- id: A unique identifier
+- id: A unique identifier (e.g., "stop-1", "shibuya-crossing")
 - name: The actual name of the place
 - description: What to do or see there (1-2 sentences)
-- duration: Realistic time to spend
-- longitude/latitude: Accurate coordinates
+- duration: Realistic time to spend (e.g., "1 hour", "30 min", "2 hours")
+- longitude: Accurate longitude coordinate
+- latitude: Accurate latitude coordinate
 - type: One of "food", "attraction", "hotel", "transport", "activity", "shopping"
 
-Use REAL places with accurate coordinates. Order stops logically.`,
-    prompt: `Create an itinerary for: ${prompt}`,
+Guidelines:
+- Use REAL places with accurate coordinates
+- Order stops logically for efficient travel
+- Include a mix of stop types when appropriate
+- Keep descriptions concise but informative
+- Generate 5-7 stops for a day trip\`,
+    prompt: \`Create an itinerary for: \${prompt}\`,
+    providerOptions: {
+      openai: {
+        strictJsonSchema: false,
+      },
+    },
   });
 
   return result.toTextStreamResponse();

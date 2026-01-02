@@ -9,9 +9,9 @@ import { streamingItinerarySchema } from "./streaming-itinerary-schema";
 
 const presets = [
   {
-    label: "I want to visit all the FAANG campuses in one day",
+    label: "I want to visit Big Tech campuses in one day",
     prompt:
-      "Plan a day trip to visit the main FAANG headquarters in the San Francisco Bay Area. Include 4-5 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
+      "Plan a day trip to visit major tech company headquarters in the San Francisco Bay Area. Include 4-5 stops with Google, Apple, Meta, and other major tech campuses I can see or take photos at.",
   },
   {
     label: "Planning a figure hunting day in Den Den Town",
