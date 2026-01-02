@@ -210,9 +210,16 @@ function StopListSkeleton() {
         <Skeleton className="h-6 w-6 rounded-full" />
         <div className="w-px flex-1 bg-border" />
       </div>
-      <div className="flex-1 pb-4">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="mt-1 h-3 w-48" />
+      <div className="flex-1 space-y-1.5 pb-4">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3 w-5" />
+          <Skeleton className="h-4 w-28" />
+        </div>
+        <Skeleton className="h-3 w-full max-w-[200px]" />
+        <div className="flex items-center gap-1">
+          <Skeleton className="h-3 w-3" />
+          <Skeleton className="h-3 w-14" />
+        </div>
       </div>
     </div>
   );
@@ -293,6 +300,7 @@ export function StreamingItinerary({
 }: StreamingItineraryProps) {
   const isStreaming = isLoading && data !== undefined;
   const isComplete = !isLoading && data !== undefined;
+  const isIdle = !isLoading && data === undefined;
   const currentState = isComplete
     ? "complete"
     : isStreaming
@@ -362,28 +370,73 @@ export function StreamingItinerary({
     <Stream.Root data={data} isLoading={isLoading} error={error}>
       <Card
         className={cn(
-          "w-full max-w-2xl overflow-hidden transition-colors",
+          "w-full max-w-2xl overflow-hidden transition-color",
+          isIdle ? "py-0" : "py-6",
           borderColors[currentState],
           className,
         )}
       >
-        <CardHeader className="pb-2">
-          <CardTitle>
-            <Stream.Field fallback={<Skeleton className="h-6 w-48" />}>
-              {data?.title}
-            </Stream.Field>
-          </CardTitle>
-          <Stream.Field fallback={<Skeleton className="h-4 w-64" />}>
-            {data?.description && (
-              <p className="text-sm text-muted-foreground">
-                {data.description}
-              </p>
-            )}
-          </Stream.Field>
-        </CardHeader>
+        <AnimatePresence mode="popLayout">
+          {!isIdle && (
+            <motion.div
+              initial={{
+                opacity: 0,
+                clipPath: "inset(0 0 100% 0)",
+                y: -8,
+              }}
+              animate={{
+                opacity: 1,
+                clipPath: "inset(0 0 0 0)",
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                clipPath: "inset(0 0 100% 0)",
+                y: -8,
+              }}
+              transition={{
+                duration: 0.25,
+                ease: [0.4, 0, 0.2, 1],
+              }}
+              style={{ willChange: "clip-path, opacity, transform" }}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle>
+                  <Stream.Field fallback={<Skeleton className="h-6 w-3/4" />}>
+                    {data?.title}
+                  </Stream.Field>
+                </CardTitle>
+                <Stream.Field
+                  fallback={
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                  }
+                >
+                  {data?.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {data.description}
+                    </p>
+                  )}
+                </Stream.Field>
+              </CardHeader>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <CardContent className="space-y-4 p-0">
-          <div className="relative h-[300px] w-full">
+        <CardContent className="p-0">
+          <motion.div
+            layout
+            className="relative w-full"
+            initial={false}
+            animate={{ height: isIdle ? 400 : 280 }}
+            transition={{
+              height: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+              layout: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+            }}
+            style={{ willChange: "height" }}
+          >
             <Map
               center={mapBounds?.center ?? [0, 20]}
               zoom={mapBounds?.zoom ?? 2}
@@ -410,32 +463,56 @@ export function StreamingItinerary({
                 ))}
               </AnimatePresence>
             </Map>
-          </div>
+          </motion.div>
 
-          <div className="max-h-[200px] overflow-y-auto px-6 pb-4">
-            {validStops.length > 0 ? (
-              <div>
-                {validStops.map((stop, index) => (
-                  <StopListItem
-                    key={stop.id ?? index}
-                    stop={stop}
-                    index={index}
-                    isLast={index === validStops.length - 1 && !isLoading}
-                  />
-                ))}
-                {isLoading && <StopListSkeleton />}
-              </div>
-            ) : isLoading ? (
-              <div className="space-y-2">
-                <StopListSkeleton />
-                <StopListSkeleton />
-              </div>
-            ) : (
-              <p className="py-4 text-center text-sm text-muted-foreground">
-                Click a button to generate an itinerary
-              </p>
+          <AnimatePresence mode="popLayout">
+            {!isIdle && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  clipPath: "inset(100% 0 0 0)",
+                  y: 16,
+                }}
+                animate={{
+                  opacity: 1,
+                  clipPath: "inset(0 0 0 0)",
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  clipPath: "inset(100% 0 0 0)",
+                  y: 16,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: [0.4, 0, 0.2, 1],
+                  delay: 0.05,
+                }}
+                style={{ willChange: "clip-path, opacity, transform" }}
+                className="max-h-[200px] overflow-y-auto px-6 py-4"
+              >
+                {validStops.length > 0 ? (
+                  <div>
+                    {validStops.map((stop, index) => (
+                      <StopListItem
+                        key={stop.id ?? index}
+                        stop={stop}
+                        index={index}
+                        isLast={index === validStops.length - 1 && !isLoading}
+                      />
+                    ))}
+                    {isLoading && <StopListSkeleton />}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <StopListSkeleton />
+                    <StopListSkeleton />
+                    <StopListSkeleton />
+                  </div>
+                )}
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </CardContent>
       </Card>
     </Stream.Root>
