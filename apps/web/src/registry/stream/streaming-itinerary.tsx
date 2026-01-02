@@ -12,7 +12,7 @@ import {
   Train,
   Utensils,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -75,6 +75,7 @@ interface StopMarkerProps {
 function StopMarker({ stop, index }: StopMarkerProps) {
   const Icon = getStopIcon(stop.type);
   const color = getStopColor(stop.type);
+  const prefersReducedMotion = useReducedMotion();
 
   if (
     stop.longitude === undefined ||
@@ -88,14 +89,20 @@ function StopMarker({ stop, index }: StopMarkerProps) {
     <MapMarker longitude={stop.longitude} latitude={stop.latitude}>
       <MarkerContent>
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
+          initial={
+            prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }
+          }
           animate={{ scale: 1, opacity: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 20,
-            delay: index * 0.1,
-          }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 }
+              : {
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20,
+                  delay: index * 0.1,
+                }
+          }
           className="relative"
         >
           <div
@@ -104,7 +111,7 @@ function StopMarker({ stop, index }: StopMarkerProps) {
               color,
             )}
           >
-            <Icon className="h-4 w-4 text-white" />
+            <Icon className="h-4 w-4 text-white" aria-hidden="true" />
           </div>
           <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background">
             {index + 1}
@@ -120,7 +127,7 @@ function StopMarker({ stop, index }: StopMarkerProps) {
                 color,
               )}
             >
-              <Icon className="h-3 w-3 text-white" />
+              <Icon className="h-3 w-3 text-white" aria-hidden="true" />
             </div>
             <span className="font-medium">{stop.name}</span>
           </div>
@@ -129,7 +136,7 @@ function StopMarker({ stop, index }: StopMarkerProps) {
           )}
           {stop.duration && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="h-3 w-3" />
+              <Clock className="h-3 w-3" aria-hidden="true" />
               {stop.duration}
             </div>
           )}
@@ -148,15 +155,19 @@ interface StopListItemProps {
 function StopListItem({ stop, index, isLast }: StopListItemProps) {
   const Icon = getStopIcon(stop.type);
   const color = getStopColor(stop.type);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -12 }}
+      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.05 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { duration: 0.2, delay: index * 0.05 }
+      }
       className="flex gap-3"
     >
-      {/* Timeline */}
       <div className="flex flex-col items-center">
         <div
           className={cn(
@@ -164,12 +175,11 @@ function StopListItem({ stop, index, isLast }: StopListItemProps) {
             color,
           )}
         >
-          <Icon className="h-3 w-3 text-white" />
+          <Icon className="h-3 w-3 text-white" aria-hidden="true" />
         </div>
         {!isLast && <div className="w-px flex-1 bg-border" />}
       </div>
 
-      {/* Content */}
       <div className={cn("pb-4", isLast && "pb-0")}>
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">
@@ -184,7 +194,7 @@ function StopListItem({ stop, index, isLast }: StopListItemProps) {
         )}
         {stop.duration && (
           <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
+            <Clock className="h-3 w-3" aria-hidden="true" />
             {stop.duration}
           </div>
         )}
@@ -298,10 +308,6 @@ export function StreamingItinerary({
     complete: "border-green-500/50",
   };
 
-  // Filter valid stops with coordinates
-  // IMPORTANT: We wait for `type` to exist because coordinates stream digit-by-digit
-  // (e.g., longitude: 2 → 2.3 → 2.33 → 2.3364). Without this check, the camera
-  // would fly to partial coordinates like [2, 48] which is in the ocean!
   const validStops = React.useMemo(() => {
     if (!data?.stops) return [];
     return data.stops.filter(
@@ -377,7 +383,6 @@ export function StreamingItinerary({
         </CardHeader>
 
         <CardContent className="space-y-4 p-0">
-          {/* Map */}
           <div className="relative h-[300px] w-full">
             <Map
               center={mapBounds?.center ?? [0, 20]}
@@ -386,7 +391,6 @@ export function StreamingItinerary({
               <CameraController stops={validStops} isStreaming={isStreaming} />
               <MapControls showZoom showLocate={false} />
 
-              {/* Route line */}
               {routeCoordinates.length >= 2 && (
                 <MapRoute
                   coordinates={routeCoordinates}
@@ -396,7 +400,6 @@ export function StreamingItinerary({
                 />
               )}
 
-              {/* Stop markers */}
               <AnimatePresence>
                 {validStops.map((stop, index) => (
                   <StopMarker
@@ -409,7 +412,6 @@ export function StreamingItinerary({
             </Map>
           </div>
 
-          {/* Stop list */}
           <div className="max-h-[200px] overflow-y-auto px-6 pb-4">
             {validStops.length > 0 ? (
               <div>

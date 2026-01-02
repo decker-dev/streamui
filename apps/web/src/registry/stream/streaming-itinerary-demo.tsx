@@ -1,7 +1,7 @@
 "use client";
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { MapPin } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { StreamingItinerary } from "./streaming-itinerary";
@@ -54,7 +54,11 @@ export function StreamingItineraryDemo() {
       />
 
       {error && (
-        <p className="text-center text-sm text-destructive">
+        <p
+          className="text-center text-sm text-destructive"
+          role="alert"
+          aria-live="polite"
+        >
           Error: {error.message}
         </p>
       )}
@@ -71,7 +75,14 @@ export function StreamingItineraryDemo() {
             disabled={isLoading}
             className="justify-start gap-1.5"
           >
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            {isLoading && selectedPreset?.label === preset.label ? (
+              <Loader2
+                className="h-3.5 w-3.5 shrink-0 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            )}
             <span className="truncate">{preset.label}</span>
           </Button>
         ))}
