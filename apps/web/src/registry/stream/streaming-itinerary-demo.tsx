@@ -57,7 +57,7 @@ export function StreamingItineraryDemo() {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {presets.map((preset) => (
           <Button
             key={preset.label}
@@ -67,10 +67,10 @@ export function StreamingItineraryDemo() {
             size="sm"
             onClick={() => handlePreset(preset)}
             disabled={isLoading}
-            className="gap-1.5"
+            className="justify-start gap-1.5"
           >
-            <MapPin className="h-3.5 w-3.5" />
-            {preset.label}
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{preset.label}</span>
           </Button>
         ))}
       </div>
