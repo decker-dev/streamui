@@ -15,7 +15,9 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation shadowing>
   Map,
+  useMap,
   MapMarker,
   MarkerContent,
   MarkerPopup,
@@ -206,6 +208,66 @@ function StopListSkeleton() {
   );
 }
 
+interface CameraControllerProps {
+  stops: DeepPartial<ItineraryStop>[];
+  isStreaming: boolean;
+}
+
+function CameraController({ stops, isStreaming }: CameraControllerProps) {
+  const { map, isLoaded } = useMap();
+  const prevStopsCountRef = React.useRef(0);
+
+  // Adjust camera as stops are added
+  React.useEffect(() => {
+    if (!map || !isLoaded || stops.length === 0) return;
+
+    const lngs = stops
+      .filter((s) => typeof s.longitude === "number")
+      .map((s) => s.longitude as number);
+    const lats = stops
+      .filter((s) => typeof s.latitude === "number")
+      .map((s) => s.latitude as number);
+
+    if (lngs.length === 0 || lats.length === 0) return;
+
+    // Only animate if stops count changed (new stop added)
+    const stopsCountChanged = stops.length !== prevStopsCountRef.current;
+    prevStopsCountRef.current = stops.length;
+
+    if (!stopsCountChanged) return;
+
+    if (stops.length === 1) {
+      // First stop: fly to it
+      map.flyTo({
+        center: [lngs[0], lats[0]],
+        zoom: 14,
+        duration: 800,
+      });
+    } else {
+      // Multiple stops: fit bounds with smooth animation
+      map.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        {
+          padding: 60,
+          duration: isStreaming ? 600 : 1000,
+        },
+      );
+    }
+  }, [map, isLoaded, stops, isStreaming]);
+
+  // Reset when stops are cleared (new request)
+  React.useEffect(() => {
+    if (stops.length === 0) {
+      prevStopsCountRef.current = 0;
+    }
+  }, [stops.length]);
+
+  return null;
+}
+
 interface StreamingItineraryProps {
   data: DeepPartial<StreamingItineraryData> | undefined;
   isLoading: boolean;
@@ -237,6 +299,9 @@ export function StreamingItinerary({
   };
 
   // Filter valid stops with coordinates
+  // IMPORTANT: We wait for `type` to exist because coordinates stream digit-by-digit
+  // (e.g., longitude: 2 → 2.3 → 2.33 → 2.3364). Without this check, the camera
+  // would fly to partial coordinates like [2, 48] which is in the ocean!
   const validStops = React.useMemo(() => {
     if (!data?.stops) return [];
     return data.stops.filter(
@@ -245,7 +310,11 @@ export function StreamingItinerary({
         stop !== undefined &&
         typeof stop.name === "string" &&
         typeof stop.longitude === "number" &&
-        typeof stop.latitude === "number",
+        typeof stop.latitude === "number" &&
+        Number.isFinite(stop.longitude) &&
+        Number.isFinite(stop.latitude) &&
+        typeof stop.type === "string" &&
+        stop.type.length > 0,
     );
   }, [data?.stops]);
 
@@ -278,7 +347,8 @@ export function StreamingItinerary({
   // Route coordinates for the line
   const routeCoordinates = React.useMemo(() => {
     return validStops.map(
-      (stop) => [stop.longitude as number, stop.latitude as number] as [number, number],
+      (stop) =>
+        [stop.longitude as number, stop.latitude as number] as [number, number],
     );
   }, [validStops]);
 
@@ -299,7 +369,9 @@ export function StreamingItinerary({
           </CardTitle>
           <Stream.Field fallback={<Skeleton className="h-4 w-64" />}>
             {data?.description && (
-              <p className="text-sm text-muted-foreground">{data.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {data.description}
+              </p>
             )}
           </Stream.Field>
         </CardHeader>
@@ -311,6 +383,7 @@ export function StreamingItinerary({
               center={mapBounds?.center ?? [0, 20]}
               zoom={mapBounds?.zoom ?? 2}
             >
+              <CameraController stops={validStops} isStreaming={isStreaming} />
               <MapControls showZoom showLocate={false} />
 
               {/* Route line */}
@@ -366,4 +439,3 @@ export function StreamingItinerary({
     </Stream.Root>
   );
 }
-
