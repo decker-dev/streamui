@@ -3,33 +3,33 @@
 import type { DeepPartial } from "@stream.ui/react";
 import { Stream } from "@stream.ui/react";
 import {
-  Utensils,
   Camera,
-  Hotel,
-  Train,
-  Footprints,
-  ShoppingBag,
-  MapPin,
   Clock,
+  Footprints,
+  Hotel,
+  MapPin,
+  ShoppingBag,
+  Train,
+  Utensils,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation shadowing>
   Map,
-  useMap,
+  MapControls,
   MapMarker,
+  MapRoute,
   MarkerContent,
   MarkerPopup,
-  MapControls,
-  MapRoute,
+  useMap,
 } from "@/components/ui/map";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type {
-  StreamingItineraryData,
   ItineraryStop,
+  StreamingItineraryData,
 } from "./streaming-itinerary-schema";
 
 const stopTypeIcons: Record<

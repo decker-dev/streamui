@@ -35,4 +35,3 @@ Guidelines:
 
   return result.toTextStreamResponse();
 }
-

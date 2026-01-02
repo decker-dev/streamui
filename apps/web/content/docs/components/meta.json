@@ -1,4 +1,9 @@
 {
   "title": "Components",
-  "pages": ["streaming-text", "streaming-chart", "streaming-tree", "streaming-itinerary"]
+  "pages": [
+    "streaming-text",
+    "streaming-chart",
+    "streaming-tree",
+    "streaming-itinerary"
+  ]
 }
