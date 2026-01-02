@@ -400,7 +400,7 @@ export function StreamingItinerary({
               }}
               style={{ willChange: "clip-path, opacity, transform" }}
             >
-              <CardHeader className="pb-2">
+              <CardHeader className="min-h-[100px] pb-2">
                 <CardTitle>
                   <Stream.Field fallback={<Skeleton className="h-6 w-3/4" />}>
                     {data?.title}
