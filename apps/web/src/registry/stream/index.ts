@@ -4,3 +4,6 @@ export * from "./streaming-chart-schema";
 export * from "./streaming-text";
 export * from "./streaming-text-demo";
 export * from "./streaming-text-schema";
+export * from "./streaming-tree";
+export * from "./streaming-tree-demo";
+export * from "./streaming-tree-schema";
