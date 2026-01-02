@@ -1,0 +1,176 @@
+---
+title: Streaming Itinerary
+description: An interactive map component that streams travel itineraries from AI with animated markers and routes.
+---
+
+import { StreamingItinerary } from "@/registry/stream/streaming-itinerary";
+import { StreamingItineraryDemo } from "@/registry/stream/streaming-itinerary-demo";
+
+A trip planning component that progressively reveals stops on an interactive map as they stream from AI, with animated markers, route lines, and a timeline sidebar.
+
+<ComponentPreview
+  animated
+  code={`"use client";
+
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { MapPin } from "lucide-react";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { StreamingItinerary } from "@/components/ui/streaming-itinerary";
+import { streamingItinerarySchema } from "@/components/ui/streaming-itinerary-schema";
+
+const presets = [
+  { label: "Tokyo Food", prompt: "Plan a food lover's day trip in Tokyo" },
+  { label: "Paris Art", prompt: "Plan a cultural day in Paris with museums" },
+  { label: "NYC Walk", prompt: "Plan a walking tour of Manhattan landmarks" },
+];
+
+export function StreamingItineraryDemo() {
+  const [selectedPreset, setSelectedPreset] = React.useState(presets[0]);
+
+  const { object, submit, isLoading, error } = useObject({
+    api: "/api/stream/itinerary",
+    schema: streamingItinerarySchema,
+  });
+
+  const handlePreset = (preset: (typeof presets)[number]) => {
+    setSelectedPreset(preset);
+    submit({ prompt: preset.prompt });
+  };
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col gap-4">
+      <StreamingItinerary
+        data={object ?? undefined}
+        isLoading={isLoading}
+        error={error ?? undefined}
+      />
+
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {presets.map((preset) => (
+          <Button
+            key={preset.label}
+            variant={selectedPreset.label === preset.label ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePreset(preset)}
+            disabled={isLoading}
+            className="gap-1.5"
+          >
+            <MapPin className="h-3.5 w-3.5" />
+            {preset.label}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}`}
+>
+  <StreamingItineraryDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npm install @stream.ui/react maplibre-gl lucide-react motion
+```
+
+```bash
+npx shadcn@latest add card skeleton
+```
+
+Copy the [Map component from mapcn](https://mapcn.vercel.app/docs) to your project.
+
+```tsx title="streaming-itinerary-schema.ts"
+import { z } from "zod";
+
+export const itineraryStopSchema = z.object({
+  id: z.string().describe("Unique identifier for the stop"),
+  name: z.string().describe("Name of the place or attraction"),
+  description: z.string().describe("Brief description of what to do here"),
+  duration: z.string().describe("Suggested time to spend"),
+  longitude: z.number().describe("Longitude coordinate"),
+  latitude: z.number().describe("Latitude coordinate"),
+  type: z
+    .enum(["food", "attraction", "hotel", "transport", "activity", "shopping"])
+    .describe("Type of stop"),
+});
+
+export const streamingItinerarySchema = z.object({
+  title: z.string().describe("Trip title"),
+  description: z.string().describe("Brief overview of the trip"),
+  stops: z.array(itineraryStopSchema).describe("Ordered list of stops"),
+});
+
+export type ItineraryStop = z.infer<typeof itineraryStopSchema>;
+export type StreamingItineraryData = z.infer<typeof streamingItinerarySchema>;
+```
+
+```tsx title="app/api/stream/itinerary/route.ts"
+import { openai } from "@ai-sdk/openai";
+import { streamObject } from "ai";
+import { streamingItinerarySchema } from "@/components/ui/streaming-itinerary-schema";
+
+export async function POST(request: Request) {
+  const { prompt } = await request.json();
+
+  const result = streamObject({
+    model: openai("gpt-4o-mini"),
+    schema: streamingItinerarySchema,
+    system: `You are a travel planning assistant. Generate detailed itineraries with real, accurate locations.
+
+For each stop, provide:
+- id: A unique identifier
+- name: The actual name of the place
+- description: What to do or see there (1-2 sentences)
+- duration: Realistic time to spend
+- longitude/latitude: Accurate coordinates
+- type: One of "food", "attraction", "hotel", "transport", "activity", "shopping"
+
+Use REAL places with accurate coordinates. Order stops logically.`,
+    prompt: `Create an itinerary for: ${prompt}`,
+  });
+
+  return result.toTextStreamResponse();
+}
+```
+
+## Features
+
+- **Interactive Map**: Built on MapLibre GL with theme support (light/dark)
+- **Animated Markers**: Stops appear with spring animations as they stream
+- **Route Visualization**: Automatic route line connecting all stops
+- **Timeline Sidebar**: Scrollable list of stops with icons and duration
+- **Type-based Icons**: Different icons for food, attractions, hotels, etc.
+- **Popup Details**: Click markers for more information
+
+## API Reference
+
+### StreamingItinerary
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `data` | `DeepPartial<StreamingItineraryData> \| undefined` | — |
+| `isLoading` | `boolean` | — |
+| `error` | `Error \| undefined` | — |
+| `className` | `string \| undefined` | — |
+
+### StreamingItineraryData Schema
+
+| Field | Type |
+| --- | --- |
+| `title` | `string` |
+| `description` | `string` |
+| `stops` | `ItineraryStop[]` |
+
+### ItineraryStop Schema
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `name` | `string` |
+| `description` | `string` |
+| `duration` | `string` |
+| `longitude` | `number` |
+| `latitude` | `number` |
+| `type` | `"food" \| "attraction" \| "hotel" \| "transport" \| "activity" \| "shopping"` |
+
