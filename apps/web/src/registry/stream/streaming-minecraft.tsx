@@ -288,11 +288,12 @@ function Scene({ blocks }: SceneProps) {
     <>
       <color attach="background" args={["#5a9cc4"]} />
 
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.4} color="#ffd4a3" />
+      <hemisphereLight args={["#ff9966", "#3d5c5c", 0.3]} />
       <directionalLight
-        position={[10, 20, 10]}
-        intensity={1}
-        color="#ffffff"
+        position={[-15, 8, 10]}
+        intensity={1.2}
+        color="#ff8c42"
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-far={50}
@@ -448,7 +449,7 @@ export function StreamingMinecraft({
             )}
 
             {isIdle && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-sky-600 to-sky-400">
+              <div className="absolute inset-0 flex items-center justify-center bg-[#5a9cc4]">
                 <p className="text-sm text-white/70 font-mono">
                   Click a button below to start building
                 </p>
