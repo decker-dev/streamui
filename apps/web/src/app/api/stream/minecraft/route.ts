@@ -7,36 +7,49 @@ export async function POST(request: Request) {
   const result = streamText({
     model: gateway("openai/gpt-4.1-mini"),
     output: Output.object({ schema: streamingMinecraftSchema }),
-    system: `You build small Minecraft structures. Output blocks one by one.
+    system: `You are a Minecraft builder. Create complete, recognizable structures block by block.
 
 GRID: 16x16x16 (x, y, z from 0-15). y=0 is ground. Center builds around x=7, z=7.
 
-BLOCKS (use these names exactly):
-- grass: green grass block
-- dirt: brown dirt
-- stone: gray stone
-- log: oak tree trunk
-- wood: oak planks (walls, floors, roofs)
-- leaves: green foliage
-- glass: transparent window
-- water: blue water
-- snow: white snow
-- ice: blue ice
-- brick: red bricks
-- gold: gold block
-- diamond: cyan crystal
+BLOCKS:
+- grass, dirt, stone, log, wood, leaves, glass
+- water, snow, ice, brick, gold, diamond
 
-RULES:
-1. Keep builds SMALL: 20-40 blocks max
-2. Build from ground up (start y=0)
-3. Use simple shapes: cubes, rectangles
-4. Each block needs unique id like "floor-1", "wall-2", "roof-3"
-5. Prefer textured blocks: wood, stone, log, leaves, glass
+CRITICAL RULES:
+1. COMPLETE structures - no missing walls, roofs, or floors
+2. Every wall needs ALL blocks from bottom to top
+3. Roofs must cover the entire building
+4. Each block needs unique id (e.g., "floor-1", "wall-north-1", "roof-1")
 
-EXAMPLES:
-- Tiny house: 4x4 wood floor, 3-high walls, flat roof, 2 glass windows = ~30 blocks
-- Tree: 1 log column (4 blocks), leaves on top (8 blocks) = ~12 blocks
-- Well: stone square base, water center = ~15 blocks`,
+HOUSE TEMPLATE (follow this pattern):
+1. FLOOR: Complete rectangle of wood blocks at y=0
+2. WALLS: 4 complete walls, 3-4 blocks high
+   - Front wall with door gap (leave 1x2 empty)
+   - Back wall solid
+   - Left and right walls solid
+   - Windows: replace some wall blocks with glass
+3. ROOF: Complete cover on top, 1 block overhang
+
+Example 5x5 house:
+- Floor: 25 wood blocks at y=0 (x=5-9, z=5-9)
+- Walls: 4 walls, 3 high = ~40 blocks (minus door/windows)
+- Roof: 25+ blocks at y=4
+- Total: ~80-100 blocks
+
+TREE TEMPLATE:
+1. TRUNK: log blocks stacked vertically (4-6 high)
+2. CROWN: leaves in a sphere/blob shape around top of trunk
+   - Layer below top: 3x3 leaves with trunk in center
+   - Top layer: 3x3 leaves
+   - Very top: 1 leaf
+
+WELL TEMPLATE:
+1. BASE: Square ring of stone (hollow center)
+2. WALLS: 2-3 blocks high stone ring
+3. WATER: Fill center with water blocks
+4. ROOF: Optional wood posts with wood plank roof
+
+BE THOROUGH - generate every single block needed. Don't skip blocks assuming they exist.`,
     prompt: prompt,
     providerOptions: {
       openai: {

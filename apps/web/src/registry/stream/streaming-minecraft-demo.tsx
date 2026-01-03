@@ -9,20 +9,20 @@ import { streamingMinecraftSchema } from "./streaming-minecraft-schema";
 
 const presets = [
   {
-    label: "Small house",
-    prompt: "Build a tiny wooden house: 4x4 floor, 3 blocks tall walls, flat roof, 2 glass windows.",
+    label: "Wooden house",
+    prompt: "Build a complete small wooden house: wood plank floor (5x5), 4 solid walls 3 blocks high with 2 glass windows and a door gap, and a full wood roof on top. Make sure every wall is complete with no gaps except the door.",
   },
   {
     label: "Oak tree",
-    prompt: "Build a simple oak tree: 4 log blocks as trunk, leaves on top forming a small crown.",
+    prompt: "Build a complete oak tree: trunk of 5 log blocks stacked vertically, then a full sphere of leaves around the top (about 20-25 leaf blocks forming a complete crown).",
   },
   {
-    label: "Stone well",
-    prompt: "Build a small stone well: square base with water in the center.",
+    label: "Christmas tree",
+    prompt: "Build a Christmas tree: log trunk (3 blocks), then layers of leaves getting smaller as they go up (5x5 at bottom, then 3x3, then 1x1 at top). Decorate with gold and diamond blocks scattered on the leaves as ornaments. Add a gold block star on top.",
   },
   {
-    label: "Garden",
-    prompt: "Build a tiny garden: grass base, one tree, and some flowers using leaves.",
+    label: "Cottage with garden",
+    prompt: "Build a complete cottage scene: a small brick house with wood floor, glass windows, full roof, plus 2 small trees nearby and some grass blocks as a garden path.",
   },
 ];
 
