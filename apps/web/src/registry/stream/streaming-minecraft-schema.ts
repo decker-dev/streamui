@@ -21,6 +21,8 @@ export const minecraftBlockSchema = z.object({
       "snow",
       "sand",
       "water",
+      "door_bottom",
+      "door_top",
     ])
     .describe("Block type"),
 });

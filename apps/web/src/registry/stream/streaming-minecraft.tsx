@@ -45,6 +45,8 @@ function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
     snow: "/textures/minecraft/snow.png",
     sand: "/textures/minecraft/sand.png",
     water: "/textures/minecraft/water.png",
+    door_bottom: "/textures/minecraft/door_bottom.png",
+    door_top: "/textures/minecraft/door_top.png",
   });
 
   React.useEffect(() => {
@@ -135,6 +137,10 @@ function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
           transparent: true,
           opacity: 0.7,
         });
+      case "door_bottom":
+        return new THREE.MeshLambertMaterial({ map: textures.door_bottom });
+      case "door_top":
+        return new THREE.MeshLambertMaterial({ map: textures.door_top });
       default:
         return new THREE.MeshLambertMaterial({ color: "#888888" });
     }
@@ -159,8 +165,8 @@ function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
 
 function GrassFloor() {
   const textures = useTexture({
-    grass_top: "/textures/minecraft/grass_top.png",
-    grass_side: "/textures/minecraft/grass_side.png",
+    snow: "/textures/minecraft/snow.png",
+    grass_snow: "/textures/minecraft/grass_snow.png",
     dirt: "/textures/minecraft/dirt.png",
   });
 
@@ -175,12 +181,12 @@ function GrassFloor() {
 
   const materials = React.useMemo(
     () => [
-      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
-      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
-      new THREE.MeshLambertMaterial({ map: textures.grass_top }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_snow }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_snow }),
+      new THREE.MeshLambertMaterial({ map: textures.snow }),
       new THREE.MeshLambertMaterial({ map: textures.dirt }),
-      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
-      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_snow }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_snow }),
     ],
     [textures],
   );
@@ -218,7 +224,7 @@ interface SceneProps {
 function Scene({ blocks }: SceneProps) {
   return (
     <>
-      <color attach="background" args={["#87CEEB"]} />
+      <color attach="background" args={["#5a9cc4"]} />
 
       <ambientLight intensity={0.6} />
       <directionalLight
@@ -377,8 +383,8 @@ export function StreamingMinecraft({
             )}
 
             {isIdle && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-sky-400 to-sky-200">
-                <p className="text-sm text-sky-900/70 font-mono">
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-sky-600 to-sky-400">
+                <p className="text-sm text-white/70 font-mono">
                   Click a button below to start building
                 </p>
               </div>

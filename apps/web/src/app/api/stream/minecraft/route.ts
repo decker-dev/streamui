@@ -26,6 +26,8 @@ BLOCKS (all have textures):
 - snow: white snow
 - sand: tan sand
 - water: blue water
+- door_bottom: bottom half of wooden door
+- door_top: top half of wooden door (use both for a full door)
 
 CRITICAL RULES:
 1. COMPLETE structures - no missing walls, roofs, or floors
@@ -36,7 +38,7 @@ CRITICAL RULES:
 HOUSE TEMPLATE (follow this pattern):
 1. FLOOR: Complete rectangle of wood blocks at y=0
 2. WALLS: 4 complete walls, 3 blocks high
-   - Front wall with door gap (leave 1x2 empty)
+   - Front wall with DOOR (door_bottom at y=1, door_top at y=2)
    - Back wall solid
    - Left and right walls solid
    - Windows: replace some wall blocks with glass
@@ -48,6 +50,7 @@ HOUSE TEMPLATE (follow this pattern):
 Example 5x5 house with pointed roof:
 - Floor: 25 wood blocks at y=0
 - Walls: 3 blocks high (y=1,2,3)
+- Door: door_bottom at y=1, door_top at y=2 (front center)
 - Roof at y=4: 5 blocks wide
 - Roof at y=5: 3 blocks wide (centered)
 - Roof at y=6: 1 block wide (ridge/peak)

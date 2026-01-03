@@ -10,19 +10,23 @@ import { streamingMinecraftSchema } from "./streaming-minecraft-schema";
 const presets = [
   {
     label: "Wooden house",
-    prompt: "Build a wooden house with a POINTED ROOF: wood floor (5x5), brick walls 3 blocks high with glass windows and door gap. The roof must be triangular/A-frame style: first layer 5 wide, second layer 3 wide, top layer 1 block (the peak). Fill the triangular gables on front and back with wood.",
+    prompt:
+      "Build a wooden house with a POINTED ROOF: wood floor (5x5), brick walls 3 blocks high with glass windows and a wooden door (use door_bottom at y=1 and door_top at y=2). The roof must be triangular/A-frame style: first layer 5 wide, second layer 3 wide, top layer 1 block (the peak). Fill the triangular gables on front and back with wood.",
   },
   {
     label: "Oak tree",
-    prompt: "Build a complete oak tree: trunk of 5 log blocks stacked vertically, then a full sphere of leaves around the top (about 20-25 leaf blocks forming a complete crown).",
+    prompt:
+      "Build a complete oak tree: trunk of 5 log blocks stacked vertically, then a full sphere of leaves around the top (about 20-25 leaf blocks forming a complete crown).",
   },
   {
     label: "Christmas tree",
-    prompt: "Build a Christmas tree: log trunk (3 blocks), then layers of leaves getting smaller as they go up (5x5 at bottom, then 3x3, then 1x1 at top). Decorate with gold and diamond blocks scattered on the leaves as ornaments. Add a gold block star on top.",
+    prompt:
+      "Build a Christmas tree: log trunk (3 blocks), then layers of leaves getting smaller as they go up (5x5 at bottom, then 3x3, then 1x1 at top). Decorate with gold and diamond blocks scattered on the leaves as ornaments. Add a gold block star on top.",
   },
   {
     label: "Cottage with garden",
-    prompt: "Build a cozy cottage with POINTED ROOF: cobblestone walls, wood floor, glass windows, and a triangular wood roof (A-frame style going up to a peak). Add a small oak tree next to it and a few grass blocks as garden.",
+    prompt:
+      "Build a cozy cottage with POINTED ROOF: cobblestone walls, wood floor, glass windows, wooden door (door_bottom + door_top), and a triangular wood roof (A-frame style going up to a peak). Add a small oak tree next to it.",
   },
 ];
 
@@ -34,7 +38,11 @@ function BlockIcon({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M8 1L15 5V11L8 15L1 11V5L8 1Z" fill="currentColor" opacity="0.8" />
+      <path
+        d="M8 1L15 5V11L8 15L1 11V5L8 1Z"
+        fill="currentColor"
+        opacity="0.8"
+      />
       <path d="M8 1L15 5L8 9L1 5L8 1Z" fill="currentColor" />
       <path d="M8 9V15L1 11V5L8 9Z" fill="currentColor" opacity="0.6" />
     </svg>
