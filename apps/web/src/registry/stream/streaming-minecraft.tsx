@@ -25,8 +25,9 @@ interface MinecraftBlockMeshProps {
 function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
   const meshRef = React.useRef<THREE.Mesh>(null);
   const [animated, setAnimated] = React.useState(false);
-  const startY = React.useRef((block.y ?? 0) + 10);
-  const targetY = block.y ?? 0;
+  const baseY = (block.y ?? 0) + 0.5;
+  const startY = React.useRef(baseY + 10);
+  const targetY = baseY;
 
   const textures = useTexture({
     grass_top: "/textures/minecraft/grass_top.png",
@@ -45,8 +46,6 @@ function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
     snow: "/textures/minecraft/snow.png",
     sand: "/textures/minecraft/sand.png",
     water: "/textures/minecraft/water.png",
-    door_bottom: "/textures/minecraft/door_bottom.png",
-    door_top: "/textures/minecraft/door_top.png",
   });
 
   React.useEffect(() => {
@@ -137,10 +136,6 @@ function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
           transparent: true,
           opacity: 0.7,
         });
-      case "door_bottom":
-        return new THREE.MeshLambertMaterial({ map: textures.door_bottom });
-      case "door_top":
-        return new THREE.MeshLambertMaterial({ map: textures.door_top });
       default:
         return new THREE.MeshLambertMaterial({ color: "#888888" });
     }
@@ -217,6 +212,73 @@ function GrassFloor() {
   );
 }
 
+const DOOR_THICKNESS = 0.2;
+
+function DoorMesh({ block }: { block: DeepPartial<MinecraftBlock> }) {
+  const meshRef = React.useRef<THREE.Mesh>(null);
+  const [animated, setAnimated] = React.useState(false);
+  const baseY = (block.y ?? 0) + 0.5;
+  const startY = React.useRef(baseY + 10);
+  const targetY = baseY;
+
+  const textures = useTexture({
+    door_bottom: "/textures/minecraft/door_bottom.png",
+    door_top: "/textures/minecraft/door_top.png",
+  });
+
+  React.useEffect(() => {
+    Object.values(textures).forEach((texture) => {
+      texture.magFilter = THREE.NearestFilter;
+      texture.minFilter = THREE.NearestFilter;
+    });
+  }, [textures]);
+
+  useFrame((_, delta) => {
+    if (!meshRef.current || animated) return;
+    const currentY = meshRef.current.position.y;
+    const newY = THREE.MathUtils.lerp(currentY, targetY, delta * 8);
+    if (Math.abs(newY - targetY) < 0.01) {
+      meshRef.current.position.y = targetY;
+      setAnimated(true);
+    } else {
+      meshRef.current.position.y = newY;
+    }
+  });
+
+  if (
+    block.x === undefined ||
+    block.y === undefined ||
+    block.z === undefined ||
+    !block.type
+  ) {
+    return null;
+  }
+
+  const texture =
+    block.type === "door_bottom" ? textures.door_bottom : textures.door_top;
+  const material = new THREE.MeshLambertMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.5,
+  });
+
+  return (
+    <mesh
+      ref={meshRef}
+      position={[
+        block.x - GRID_SIZE / 2 + 0.5,
+        startY.current,
+        block.z - GRID_SIZE / 2 + 0.5,
+      ]}
+      castShadow
+      receiveShadow
+    >
+      <boxGeometry args={[BLOCK_SIZE, BLOCK_SIZE, DOOR_THICKNESS]} />
+      <primitive object={material} attach="material" />
+    </mesh>
+  );
+}
+
 interface SceneProps {
   blocks: DeepPartial<MinecraftBlock>[];
 }
@@ -242,9 +304,12 @@ function Scene({ blocks }: SceneProps) {
 
       <React.Suspense fallback={null}>
         <GrassFloor />
-        {blocks.map((block, index) => (
-          <MinecraftBlockMesh key={block.id ?? index} block={block} />
-        ))}
+        {blocks.map((block, index) => {
+          if (block.type === "door_bottom" || block.type === "door_top") {
+            return <DoorMesh key={block.id ?? index} block={block} />;
+          }
+          return <MinecraftBlockMesh key={block.id ?? index} block={block} />;
+        })}
       </React.Suspense>
 
       <OrbitControls
