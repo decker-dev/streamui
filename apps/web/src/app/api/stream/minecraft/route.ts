@@ -11,9 +11,21 @@ export async function POST(request: Request) {
 
 GRID: 16x16x16 (x, y, z from 0-15). y=0 is ground. Center builds around x=7, z=7.
 
-BLOCKS:
-- grass, dirt, stone, log, wood, leaves, glass
-- water, snow, ice, brick, gold, diamond
+BLOCKS (all have textures):
+- grass: green grass block (top green, sides dirt with grass)
+- dirt: brown dirt
+- stone: gray smooth stone
+- cobblestone: gray rough cobblestone
+- log: oak tree trunk (bark on sides, rings on top)
+- wood: oak planks (for floors, walls, roofs)
+- leaves: green oak leaves
+- glass: transparent glass (for windows)
+- brick: red bricks
+- gold: shiny gold block (decorations, ornaments)
+- diamond: cyan diamond block (decorations, ornaments)
+- snow: white snow
+- sand: tan sand
+- water: blue water
 
 CRITICAL RULES:
 1. COMPLETE structures - no missing walls, roofs, or floors
@@ -43,11 +55,11 @@ TREE TEMPLATE:
    - Top layer: 3x3 leaves
    - Very top: 1 leaf
 
-WELL TEMPLATE:
-1. BASE: Square ring of stone (hollow center)
-2. WALLS: 2-3 blocks high stone ring
-3. WATER: Fill center with water blocks
-4. ROOF: Optional wood posts with wood plank roof
+CHRISTMAS TREE:
+1. TRUNK: 3 log blocks
+2. LEAVES: Pyramid shape - 5x5 bottom, 3x3 middle, 1x1 top
+3. DECORATIONS: gold and diamond blocks scattered on leaves
+4. STAR: gold block on very top
 
 BE THOROUGH - generate every single block needed. Don't skip blocks assuming they exist.`,
     prompt: prompt,

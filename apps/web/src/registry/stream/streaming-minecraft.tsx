@@ -18,17 +18,6 @@ import type {
 const GRID_SIZE = 16;
 const BLOCK_SIZE = 1;
 
-const blockColors: Record<string, string> = {
-  water: "#3d85c6",
-  brick: "#96412f",
-  gold: "#f9d71c",
-  diamond: "#4aedd9",
-  snow: "#f0f0f0",
-  ice: "#a5d5f7",
-};
-
-const texturedBlocks = ["grass", "dirt", "stone", "log", "wood", "leaves", "glass"];
-
 interface MinecraftBlockMeshProps {
   block: DeepPartial<MinecraftBlock>;
   index: number;
@@ -41,15 +30,22 @@ function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
   const targetY = block.y ?? 0;
 
   const textures = useTexture({
-    grass_top: "/textures/minecraft/grass_carried.png",
-    grass_side: "/textures/minecraft/grass_side_carried.png",
+    grass_top: "/textures/minecraft/grass_top.png",
+    grass_side: "/textures/minecraft/grass_side.png",
     dirt: "/textures/minecraft/dirt.png",
     stone: "/textures/minecraft/stone.png",
-    log_side: "/textures/minecraft/log_oak.png",
-    log_top: "/textures/minecraft/log_oak_top.png",
-    wood: "/textures/minecraft/oak_planks.png",
-    leaves: "/textures/minecraft/azalea_leaves.png",
+    cobblestone: "/textures/minecraft/cobblestone.png",
+    log_side: "/textures/minecraft/log_side.png",
+    log_top: "/textures/minecraft/log_top.png",
+    wood: "/textures/minecraft/wood.png",
+    leaves: "/textures/minecraft/leaves.png",
     glass: "/textures/minecraft/glass.png",
+    brick: "/textures/minecraft/brick.png",
+    gold: "/textures/minecraft/gold.png",
+    diamond: "/textures/minecraft/diamond.png",
+    snow: "/textures/minecraft/snow.png",
+    sand: "/textures/minecraft/sand.png",
+    water: "/textures/minecraft/water.png",
   });
 
   React.useEffect(() => {
@@ -85,16 +81,6 @@ function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
   const getMaterials = (): THREE.Material | THREE.Material[] => {
     const type = block.type;
 
-    if (!type || !texturedBlocks.includes(type)) {
-      const color = blockColors[type ?? "stone"] ?? "#888888";
-      const material = new THREE.MeshLambertMaterial({
-        color,
-        transparent: type === "water" || type === "ice",
-        opacity: type === "water" ? 0.7 : type === "ice" ? 0.8 : 1,
-      });
-      return material;
-    }
-
     switch (type) {
       case "grass":
         return [
@@ -109,6 +95,8 @@ function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
         return new THREE.MeshLambertMaterial({ map: textures.dirt });
       case "stone":
         return new THREE.MeshLambertMaterial({ map: textures.stone });
+      case "cobblestone":
+        return new THREE.MeshLambertMaterial({ map: textures.cobblestone });
       case "log":
         return [
           new THREE.MeshLambertMaterial({ map: textures.log_side }),
@@ -130,7 +118,23 @@ function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
         return new THREE.MeshLambertMaterial({
           map: textures.glass,
           transparent: true,
-          opacity: 0.6,
+          opacity: 0.8,
+        });
+      case "brick":
+        return new THREE.MeshLambertMaterial({ map: textures.brick });
+      case "gold":
+        return new THREE.MeshLambertMaterial({ map: textures.gold });
+      case "diamond":
+        return new THREE.MeshLambertMaterial({ map: textures.diamond });
+      case "snow":
+        return new THREE.MeshLambertMaterial({ map: textures.snow });
+      case "sand":
+        return new THREE.MeshLambertMaterial({ map: textures.sand });
+      case "water":
+        return new THREE.MeshLambertMaterial({
+          map: textures.water,
+          transparent: true,
+          opacity: 0.7,
         });
       default:
         return new THREE.MeshLambertMaterial({ color: "#888888" });
@@ -161,7 +165,7 @@ interface SceneProps {
 function Scene({ blocks }: SceneProps) {
   return (
     <>
-      <color attach="background" args={["#e0f4ff"]} />
+      <color attach="background" args={["#87CEEB"]} />
 
       <ambientLight intensity={0.6} />
       <directionalLight
@@ -177,7 +181,11 @@ function Scene({ blocks }: SceneProps) {
         shadow-camera-bottom={-20}
       />
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -0.5, 0]}
+        receiveShadow
+      >
         <planeGeometry args={[GRID_SIZE + 4, GRID_SIZE + 4]} />
         <meshLambertMaterial color="#5a8f3a" />
       </mesh>
@@ -356,12 +364,12 @@ export function StreamingMinecraft({
               exit={{ opacity: 0, y: 10 }}
               className="px-6 py-3 border-t flex gap-4 text-xs text-muted-foreground font-mono"
             >
-              <span>🧱 {validBlocks.length} blocks</span>
+              <span>{validBlocks.length} blocks</span>
               {isStreaming && (
                 <span className="ml-auto text-emerald-500">Building…</span>
               )}
               {isComplete && (
-                <span className="ml-auto text-emerald-500">✓ Complete</span>
+                <span className="ml-auto text-emerald-500">Complete</span>
               )}
             </motion.div>
           )}

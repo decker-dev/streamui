@@ -7,21 +7,20 @@ export const minecraftBlockSchema = z.object({
   z: z.number().min(0).max(15).describe("Z depth (0-15)"),
   type: z
     .enum([
-      // Textured blocks (preferred)
       "grass",
       "dirt",
       "stone",
+      "cobblestone",
       "log",
       "wood",
       "leaves",
       "glass",
-      // Simple color blocks
-      "water",
-      "snow",
-      "ice",
       "brick",
       "gold",
       "diamond",
+      "snow",
+      "sand",
+      "water",
     ])
     .describe("Block type"),
 });
