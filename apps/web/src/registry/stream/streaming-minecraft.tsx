@@ -20,10 +20,9 @@ const BLOCK_SIZE = 1;
 
 interface MinecraftBlockMeshProps {
   block: DeepPartial<MinecraftBlock>;
-  index: number;
 }
 
-function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
+function MinecraftBlockMesh({ block }: MinecraftBlockMeshProps) {
   const meshRef = React.useRef<THREE.Mesh>(null);
   const [animated, setAnimated] = React.useState(false);
   const startY = React.useRef((block.y ?? 0) + 10);
@@ -158,6 +157,60 @@ function MinecraftBlockMesh({ block, index }: MinecraftBlockMeshProps) {
   );
 }
 
+function GrassFloor() {
+  const textures = useTexture({
+    grass_top: "/textures/minecraft/grass_top.png",
+    grass_side: "/textures/minecraft/grass_side.png",
+    dirt: "/textures/minecraft/dirt.png",
+  });
+
+  React.useEffect(() => {
+    Object.values(textures).forEach((texture) => {
+      texture.magFilter = THREE.NearestFilter;
+      texture.minFilter = THREE.NearestFilter;
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+    });
+  }, [textures]);
+
+  const materials = React.useMemo(
+    () => [
+      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_top }),
+      new THREE.MeshLambertMaterial({ map: textures.dirt }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
+      new THREE.MeshLambertMaterial({ map: textures.grass_side }),
+    ],
+    [textures],
+  );
+
+  const floorBlocks = React.useMemo(() => {
+    const blocks = [];
+    for (let x = 0; x < GRID_SIZE; x++) {
+      for (let z = 0; z < GRID_SIZE; z++) {
+        blocks.push({ x, z });
+      }
+    }
+    return blocks;
+  }, []);
+
+  return (
+    <group>
+      {floorBlocks.map(({ x, z }) => (
+        <mesh
+          key={`floor-${x}-${z}`}
+          position={[x - GRID_SIZE / 2 + 0.5, -0.5, z - GRID_SIZE / 2 + 0.5]}
+          material={materials}
+          receiveShadow
+        >
+          <boxGeometry args={[BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 interface SceneProps {
   blocks: DeepPartial<MinecraftBlock>[];
 }
@@ -181,27 +234,10 @@ function Scene({ blocks }: SceneProps) {
         shadow-camera-bottom={-20}
       />
 
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.5, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[GRID_SIZE + 4, GRID_SIZE + 4]} />
-        <meshLambertMaterial color="#5a8f3a" />
-      </mesh>
-
-      <gridHelper
-        args={[GRID_SIZE, GRID_SIZE, "#3a5f2a", "#4a7f3a"]}
-        position={[0, -0.49, 0]}
-      />
-
       <React.Suspense fallback={null}>
+        <GrassFloor />
         {blocks.map((block, index) => (
-          <MinecraftBlockMesh
-            key={block.id ?? index}
-            block={block}
-            index={index}
-          />
+          <MinecraftBlockMesh key={block.id ?? index} block={block} />
         ))}
       </React.Suspense>
 

@@ -10,7 +10,7 @@ import { streamingMinecraftSchema } from "./streaming-minecraft-schema";
 const presets = [
   {
     label: "Wooden house",
-    prompt: "Build a complete small wooden house: wood plank floor (5x5), 4 solid walls 3 blocks high with 2 glass windows and a door gap, and a full wood roof on top. Make sure every wall is complete with no gaps except the door.",
+    prompt: "Build a wooden house with a POINTED ROOF: wood floor (5x5), brick walls 3 blocks high with glass windows and door gap. The roof must be triangular/A-frame style: first layer 5 wide, second layer 3 wide, top layer 1 block (the peak). Fill the triangular gables on front and back with wood.",
   },
   {
     label: "Oak tree",
@@ -22,7 +22,7 @@ const presets = [
   },
   {
     label: "Cottage with garden",
-    prompt: "Build a complete cottage scene: a small brick house with wood floor, glass windows, full roof, plus 2 small trees nearby and some grass blocks as a garden path.",
+    prompt: "Build a cozy cottage with POINTED ROOF: cobblestone walls, wood floor, glass windows, and a triangular wood roof (A-frame style going up to a peak). Add a small oak tree next to it and a few grass blocks as garden.",
   },
 ];
 

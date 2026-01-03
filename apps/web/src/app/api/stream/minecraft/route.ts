@@ -35,18 +35,24 @@ CRITICAL RULES:
 
 HOUSE TEMPLATE (follow this pattern):
 1. FLOOR: Complete rectangle of wood blocks at y=0
-2. WALLS: 4 complete walls, 3-4 blocks high
+2. WALLS: 4 complete walls, 3 blocks high
    - Front wall with door gap (leave 1x2 empty)
    - Back wall solid
    - Left and right walls solid
    - Windows: replace some wall blocks with glass
-3. ROOF: Complete cover on top, 1 block overhang
+3. ROOF: POINTED/TRIANGULAR roof (A-frame style)
+   - Build triangular gables on front and back walls
+   - Sloped rows of blocks going up to a ridge
+   - Example for 5-wide house: bottom row 5 blocks, then 3, then 1 at peak
 
-Example 5x5 house:
-- Floor: 25 wood blocks at y=0 (x=5-9, z=5-9)
-- Walls: 4 walls, 3 high = ~40 blocks (minus door/windows)
-- Roof: 25+ blocks at y=4
-- Total: ~80-100 blocks
+Example 5x5 house with pointed roof:
+- Floor: 25 wood blocks at y=0
+- Walls: 3 blocks high (y=1,2,3)
+- Roof at y=4: 5 blocks wide
+- Roof at y=5: 3 blocks wide (centered)
+- Roof at y=6: 1 block wide (ridge/peak)
+- Front/back gables: triangular wood fill
+- Total: ~100-120 blocks
 
 TREE TEMPLATE:
 1. TRUNK: log blocks stacked vertically (4-6 high)
