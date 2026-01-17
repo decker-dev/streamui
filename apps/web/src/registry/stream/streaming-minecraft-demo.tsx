@@ -11,7 +11,7 @@ const presets = [
   {
     label: "Wooden house",
     prompt:
-      "Build a wooden house with a POINTED ROOF: wood floor (5x5), brick walls 3 blocks high with glass windows and a wooden door (use door_bottom at y=1 and door_top at y=2). The roof must be triangular/A-frame style: first layer 5 wide, second layer 3 wide, top layer 1 block (the peak). Fill the triangular gables on front and back with wood.",
+      "Build a wooden house with a pointed roof: brick walls 3 blocks high with glass windows and a wooden door. The roof must be triangular/A-frame style going up to a peak.",
   },
   {
     label: "Oak tree",
@@ -24,9 +24,9 @@ const presets = [
       "Build a Christmas tree: log trunk (3 blocks), then layers of leaves getting smaller as they go up (5x5 at bottom, then 3x3, then 1x1 at top). Decorate with gold and diamond blocks scattered on the leaves as ornaments. Add a gold block star on top.",
   },
   {
-    label: "Cottage with garden",
+    label: "Winter scene",
     prompt:
-      "Build a cozy cottage with POINTED ROOF: cobblestone walls, wood floor, glass windows, wooden door (door_bottom + door_top), and a triangular wood roof (A-frame style going up to a peak). Add a small oak tree next to it.",
+      "Build a cozy winter scene: a small brick house with snow on the roof, and 2 oak trees nearby in a garden.",
   },
 ];
 
