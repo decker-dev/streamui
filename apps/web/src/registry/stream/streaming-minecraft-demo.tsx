@@ -9,24 +9,20 @@ import { streamingMinecraftSchema } from "./streaming-minecraft-schema";
 
 const presets = [
   {
-    label: "Wooden house",
-    prompt:
-      "Build a wooden house with a pointed roof: brick walls 3 blocks high with glass windows and a wooden door. The roof must be triangular/A-frame style going up to a peak.",
+    label: "Cozy cottage",
+    prompt: "Build a cozy rustic cottage with a pointed roof.",
+  },
+  {
+    label: "Watchtower",
+    prompt: "Build a tall medieval watchtower.",
   },
   {
     label: "Oak tree",
-    prompt:
-      "Build a complete oak tree: trunk of 5 log blocks stacked vertically, then a full sphere of leaves around the top (about 20-25 leaf blocks forming a complete crown).",
+    prompt: "Build a nice oak tree.",
   },
   {
-    label: "Christmas tree",
-    prompt:
-      "Build a Christmas tree: log trunk (3 blocks), then layers of leaves getting smaller as they go up (5x5 at bottom, then 3x3, then 1x1 at top). Decorate with gold and diamond blocks scattered on the leaves as ornaments. Add a gold block star on top.",
-  },
-  {
-    label: "Winter scene",
-    prompt:
-      "Build a cozy winter scene: a small brick house with snow on the roof, and 2 oak trees nearby in a garden.",
+    label: "Garden house",
+    prompt: "Build a small house with a garden that has trees and bushes.",
   },
 ];
 
